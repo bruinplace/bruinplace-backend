@@ -1,2 +1,3 @@
-# bruinplace-backend
-apis and stuff
+# BruinPlace Backend
+
+FastAPI backend skeleton.

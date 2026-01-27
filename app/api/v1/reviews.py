@@ -1,0 +1,9 @@
+from fastapi import APIRouter, Depends
+from app.schemas.review import ReviewCreate
+from app.api.deps import get_current_user
+
+router = APIRouter()
+
+@router.post("/properties/{property_id}/reviews")
+def create_review(property_id: str, payload: ReviewCreate, user=Depends(get_current_user)):
+    return {"status": "created"}
