@@ -47,6 +47,10 @@ This will:
 - Create a virtual environment (`.venv`) if not already present
 - Install all dependencies from the existing `uv.lock` file
 
+4. Ensure environment variables are set
+
+Environment file `.env` can be found in the Google Drive folder. See `.env.example` for the fields.
+
 ## Running the Application
 
 ### Development Server
