@@ -27,7 +27,8 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 
 # Import all models so Base.metadata includes them for autogenerate
-from app.db.models import test_table  # noqa: F401
+from app.api.v1.users.models import User  # noqa: F401
+from app.api.v1.test.models import TestTable  # noqa: F401
 target_metadata = Base.metadata
 
 # other values from the config, defined by the needs of env.py,

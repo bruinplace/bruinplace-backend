@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.schemas.property import PropertyOut
+from app.api.v1.properties.schemas import PropertyOut
 
 router = APIRouter()
 

@@ -12,7 +12,7 @@ from app.api.deps import get_current_user, get_db
 from app.core.config import settings
 from app.core.security import create_access_token
 from sqlalchemy.orm import Session
-from app.db.models.user import User
+from app.api.v1.users.models import User
 
 
 router = APIRouter()
