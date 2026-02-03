@@ -51,6 +51,24 @@ This will:
 
 Environment file `.env` can be found in the Google Drive folder. See `.env.example` for the fields.
 
+## Auth (Google OAuth + JWT)
+
+Minimal Google OAuth flow that enforces UCLA domains via OIDC ID token verification.
+
+Endpoints:
+- `GET /api/v1/auth/login` → Redirects to Google
+- `GET /api/v1/auth/callback` → Exchanges code, verifies ID token, returns app JWT
+- `GET /api/v1/auth/me` → Current user (requires `Authorization: Bearer <token>`)
+- `POST /api/v1/auth/logout` → Clears transient OAuth state cookie
+
+Required env vars (in addition to DB settings):
+- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+- `GOOGLE_REDIRECT_URI` (e.g., `http://localhost:8000/api/v1/auth/callback`)
+- `ALLOWED_GOOGLE_HD` (comma-separated list, default: `ucla.edu,g.ucla.edu`)
+- `JWT_SECRET_KEY` (generate a strong secret)
+- `JWT_ALGORITHM` (default `HS256`)
+- `ACCESS_TOKEN_EXPIRE_MINUTES` (default `60`)
+
 ## Running the Application
 
 ### Development Server
