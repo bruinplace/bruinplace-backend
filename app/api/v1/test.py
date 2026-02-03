@@ -11,10 +11,10 @@ router = APIRouter()
 def sample():
     """Sample data for testing frontend display."""
     return {
-        "listings": [
-            {"id": "1", "title": "Cozy Westwood Studio", "monthly_rent": 1800},
-            {"id": "2", "title": "2BR near Campus", "monthly_rent": 2400},
-            {"id": "3", "title": "Shared Room - Gayley", "monthly_rent": 950},
+        "items": [
+            {"id": 1, "name": "Item One"},
+            {"id": 2, "name": "Item Two"},
+            {"id": 3, "name": "Item Three"},
         ],
         "message": "Sample data for testing",
     }
