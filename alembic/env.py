@@ -29,6 +29,7 @@ if config.config_file_name is not None:
 # Import all models so Base.metadata includes them for autogenerate
 from app.api.v1.users.models import User  # noqa: F401
 from app.api.v1.properties.models import Property  # noqa: F401
+from app.api.v1.listings.models import Listing  # noqa: F401
 from app.api.v1.test.models import TestTable  # noqa: F401
 target_metadata = DeclarativeBase.metadata
 
