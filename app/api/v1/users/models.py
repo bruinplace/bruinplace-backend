@@ -2,10 +2,10 @@ from datetime import datetime
 
 from sqlalchemy import Column, DateTime, String
 
-from app.db.base import BaseModel
+from app.db.base import Base
 
 
-class User(BaseModel):
+class User(Base):
     __tablename__ = "users"
 
     # Google OIDC subject is stable per client; use as primary key
@@ -14,5 +14,5 @@ class User(BaseModel):
     name = Column(String, nullable=True)
     picture = Column(String, nullable=True)
 
-    # created_at, updated_at come from BaseModel
+    # created_at, updated_at come from Base
     last_login = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)

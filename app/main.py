@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.router import api_router
 from app.db.session import engine
-from app.db.base import Base
+from app.db.base import DeclarativeBase
 from app.core.config import settings
 
 
@@ -15,7 +15,7 @@ async def lifespan(app: FastAPI):
     print("Using database:", settings.DATABASE_URL)
     # Auto-create tables in development for quick setup
     if settings.ENVIRONMENT == "development":
-        Base.metadata.create_all(bind=engine)
+        DeclarativeBase.metadata.create_all(bind=engine)
     yield
     # Shutdown
     engine.dispose()

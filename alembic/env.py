@@ -7,7 +7,7 @@ from alembic import context
 
 # Load database URL from app config
 from app.core.config import settings
-from app.db.base import Base
+from app.db.base import DeclarativeBase
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -29,7 +29,7 @@ if config.config_file_name is not None:
 # Import all models so Base.metadata includes them for autogenerate
 from app.api.v1.users.models import User  # noqa: F401
 from app.api.v1.test.models import TestTable  # noqa: F401
-target_metadata = Base.metadata
+target_metadata = DeclarativeBase.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
