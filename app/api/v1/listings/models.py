@@ -88,3 +88,24 @@ class ListingAmenity(Base):
     )
 
     # created_at, updated_at from Base
+
+
+class SavedListing(Base):
+    """Many-to-many join table between users and listings."""
+
+    __tablename__ = "saved_listings"
+
+    user_id = Column(
+        String,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        primary_key=True,
+        nullable=False,
+    )
+    listing_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("listings.id", ondelete="CASCADE"),
+        primary_key=True,
+        nullable=False,
+    )
+
+    # created_at, updated_at from Base
