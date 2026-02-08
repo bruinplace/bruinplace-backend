@@ -35,7 +35,9 @@ def login():
         # Optional hint; verification still enforced server-side
         # "hd": settings.ALLOWED_GOOGLE_HD[0] if settings.ALLOWED_GOOGLE_HD else None,
     }
-    auth_url = "https://accounts.google.com/o/oauth2/v2/auth?" + urlencode({k: v for k, v in params.items() if v is not None})
+    auth_url = "https://accounts.google.com/o/oauth2/v2/auth?" + urlencode(
+        {k: v for k, v in params.items() if v is not None}
+    )
     response = RedirectResponse(auth_url, status_code=status.HTTP_302_FOUND)
     response.set_cookie("oauth_state", state, httponly=True, samesite="lax")
     return response
@@ -50,7 +52,10 @@ def callback(
 ):
     stored_state = request.cookies.get("oauth_state")
     if not code or not state or not stored_state or state != stored_state:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid OAuth state or code")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid OAuth state or code",
+        )
 
     # Exchange authorization code for tokens
     token_resp = requests.post(
@@ -67,24 +72,34 @@ def callback(
     )
 
     if not token_resp.ok:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to exchange code")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Failed to exchange code"
+        )
 
     token_data = token_resp.json()
     id_token = token_data.get("id_token")
     if not id_token:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No id_token in response")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="No id_token in response"
+        )
 
     # Verify the ID token
-    idinfo = google_id_token.verify_oauth2_token(id_token, GoogleRequest(), settings.GOOGLE_CLIENT_ID)
+    idinfo = google_id_token.verify_oauth2_token(
+        id_token, GoogleRequest(), settings.GOOGLE_CLIENT_ID
+    )
 
     email = idinfo.get("email")
     email_verified = idinfo.get("email_verified")
     if not email or not email_verified:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Email not verified")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Email not verified"
+        )
 
     allowed = any(email.endswith("@" + d) for d in settings.allowed_google_domains)
     if not allowed:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Email domain not allowed")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Email domain not allowed"
+        )
 
     # Upsert user (JIT provisioning)
     user_id = idinfo.get("sub")
