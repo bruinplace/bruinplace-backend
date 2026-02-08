@@ -18,9 +18,13 @@ def get_current_user(
     if not token:
         token = request.cookies.get("bp_session")
     if not token:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
+        )
 
-    payload = decode_access_token(token, secret_key=settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+    payload = decode_access_token(
+        token, secret_key=settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM
+    )
 
     user = {
         "sub": payload.get("sub"),
@@ -30,7 +34,9 @@ def get_current_user(
     }
 
     if not user["sub"] or not user["email"]:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload"
+        )
 
     return user
 

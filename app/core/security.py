@@ -6,7 +6,11 @@ from jose import JWTError, jwt
 
 
 def create_access_token(
-    subject: Dict[str, Any], *, secret_key: str, algorithm: str, expires_delta: timedelta
+    subject: Dict[str, Any],
+    *,
+    secret_key: str,
+    algorithm: str,
+    expires_delta: timedelta,
 ) -> str:
     to_encode = subject.copy()
     expire = datetime.now(timezone.utc) + expires_delta
@@ -14,7 +18,9 @@ def create_access_token(
     return jwt.encode(to_encode, secret_key, algorithm=algorithm)
 
 
-def decode_access_token(token: str, *, secret_key: str, algorithm: str) -> Dict[str, Any]:
+def decode_access_token(
+    token: str, *, secret_key: str, algorithm: str
+) -> Dict[str, Any]:
     try:
         return jwt.decode(token, secret_key, algorithms=[algorithm])
     except JWTError:

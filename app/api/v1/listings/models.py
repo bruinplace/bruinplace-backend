@@ -1,7 +1,16 @@
 import enum
 import uuid
 
-from sqlalchemy import Column, Date, Enum, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import (
+    Column,
+    Date,
+    Enum,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.db.base import Base, SoftDeleteBase
@@ -31,8 +40,11 @@ class Listing(SoftDeleteBase):
     __tablename__ = "listings"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    property_id = Column(UUID(as_uuid=True), ForeignKey(
-        "properties.id", ondelete="CASCADE"), nullable=False)
+    property_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("properties.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
     title = Column(Text, nullable=False)
@@ -54,13 +66,12 @@ class Amenity(Base):
     __tablename__ = "amenities"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    key = Column(Text, unique=True, nullable=False,
-                 index=True, comment="Stable identifier")
+    key = Column(
+        Text, unique=True, nullable=False, index=True, comment="Stable identifier"
+    )
     label = Column(Text, nullable=False, comment="Human-readable amenity name")
 
-    __table_args__ = (
-        UniqueConstraint("key", name="uq_amenity_key"),
-    )
+    __table_args__ = (UniqueConstraint("key", name="uq_amenity_key"),)
 
     # created_at, updated_at from Base
 

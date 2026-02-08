@@ -25,7 +25,7 @@ app = FastAPI(
     title="BruinPlace API",
     version="0.1.0",
     description="Housing platform API for UCLA students",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # CORS for frontend (e.g. localhost:3000, localhost:5173)
@@ -35,7 +35,7 @@ app.add_middleware(
         "http://localhost:3000",
         "http://localhost:5173",
         "http://127.0.0.1:3000",
-        "http://127.0.0.1:5173"
+        "http://127.0.0.1:5173",
     ],
     allow_credentials=True,
     allow_methods=["*"],

@@ -3,7 +3,7 @@ import sys
 from typing import List, Optional
 import json
 
-from pydantic import ValidationError, field_validator
+from pydantic import ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -45,9 +45,7 @@ class Settings(BaseSettings):
     @property
     def DATABASE_URL(self) -> str:
         """Construct database URL from individual components."""
-        return (
-            f"postgresql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
-        )
+        return f"postgresql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     @property
     def allowed_google_domains(self) -> List[str]:
@@ -81,7 +79,8 @@ def load_settings() -> Settings:
             print("\nPlease check your .env file and try again.\n")
         else:
             print(
-                "\n❌ ERROR: .env file not found!\n\n" "Please create a .env file in the project root.\n"
+                "\n❌ ERROR: .env file not found!\n\n"
+                "Please create a .env file in the project root.\n"
             )
         sys.exit(1)
 

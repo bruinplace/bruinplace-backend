@@ -15,4 +15,6 @@ class User(SoftDeleteBase):
     profile_picture = Column(String, nullable=True)
 
     # created_at, updated_at, deleted_at from SoftDeleteBase
-    last_login = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
+    last_login = Column(
+        DateTime(timezone=True), default=datetime.utcnow, nullable=False
+    )

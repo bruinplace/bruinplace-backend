@@ -2,6 +2,7 @@
 Simple test endpoints for frontend integration testing.
 No auth required.
 """
+
 from fastapi import APIRouter
 
 router = APIRouter()

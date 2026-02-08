@@ -40,12 +40,13 @@ cd bruinplace-backend
 ### 3. Install Dependencies
 
 ```bash
-uv sync
+uv sync --dev
 ```
 
 This will:
 - Create a virtual environment (`.venv`) if not already present
 - Install all dependencies from the existing `uv.lock` file
+- Install development dependencies (pre-commit, ruff, etc.)
 
 ### 4. Set Up Environment Variables
 
@@ -83,7 +84,7 @@ uv run alembic current
 uv run alembic history
 ```
 
-> **⚠️ Warning: Downgrades**  
+> **⚠️ Warning: Downgrades**
 > Avoid running `alembic downgrade` unless you know exactly what you're doing. Downgrades can drop tables or columns and **cause permanent data loss**. Only use downgrade in development or when you have a backup and understand the migration you're reverting.
 
 ## Auth (Google OAuth + JWT)
