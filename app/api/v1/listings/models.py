@@ -1,10 +1,10 @@
 import enum
 import uuid
 
-from sqlalchemy import Column, Date, Enum, ForeignKey, Integer, String, Text
+from sqlalchemy import Column, Date, Enum, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 
-from app.db.base import SoftDeleteBase
+from app.db.base import Base, SoftDeleteBase
 
 
 class UnitType(str, enum.Enum):
@@ -31,7 +31,8 @@ class Listing(SoftDeleteBase):
     __tablename__ = "listings"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    property_id = Column(UUID(as_uuid=True), ForeignKey("properties.id", ondelete="CASCADE"), nullable=False)
+    property_id = Column(UUID(as_uuid=True), ForeignKey(
+        "properties.id", ondelete="CASCADE"), nullable=False)
     user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
 
     title = Column(Text, nullable=False)
@@ -47,3 +48,43 @@ class Listing(SoftDeleteBase):
     status = Column(Enum(ListingStatus), default=ListingStatus.DRAFT, nullable=False)
 
     # created_at, updated_at, deleted_at from SoftDeleteBase
+
+
+class Amenity(Base):
+    __tablename__ = "amenities"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    key = Column(Text, unique=True, nullable=False,
+                 index=True, comment="Stable identifier")
+    label = Column(Text, nullable=False, comment="Human-readable amenity name")
+
+    __table_args__ = (
+        UniqueConstraint("key", name="uq_amenity_key"),
+    )
+
+    # created_at, updated_at from Base
+
+
+class ListingAmenity(Base):
+    """Many-to-many join table between listings and amenities."""
+
+    __tablename__ = "listing_amenities"
+
+    listing_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("listings.id", ondelete="CASCADE"),
+        primary_key=True,
+        nullable=False,
+    )
+    amenity_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("amenities.id", ondelete="CASCADE"),
+        primary_key=True,
+        nullable=False,
+    )
+
+    __table_args__ = (
+        UniqueConstraint("listing_id", "amenity_id", name="uq_listing_amenity"),
+    )
+
+    # created_at, updated_at from Base
