@@ -92,7 +92,7 @@ def callback(
     if existing:
         existing.email = email
         existing.name = idinfo.get("name")
-        existing.picture = idinfo.get("picture")
+        existing.profile_picture = idinfo.get("picture")
         # Update last_login
         from datetime import datetime
 
@@ -103,7 +103,7 @@ def callback(
                 id=user_id,
                 email=email,
                 name=idinfo.get("name"),
-                picture=idinfo.get("picture"),
+                profile_picture=idinfo.get("picture"),
             )
         )
     db.commit()
@@ -113,7 +113,7 @@ def callback(
         "sub": user_id,
         "email": email,
         "name": idinfo.get("name"),
-        "picture": idinfo.get("picture"),
+        "profile_picture": idinfo.get("picture"),
     }
     access_token = create_access_token(
         payload,

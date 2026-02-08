@@ -26,7 +26,7 @@ def get_current_user(
         "sub": payload.get("sub"),
         "email": payload.get("email"),
         "name": payload.get("name"),
-        "picture": payload.get("picture"),
+        "profile_picture": payload.get("picture"),
     }
 
     if not user["sub"] or not user["email"]:
