@@ -9,6 +9,7 @@ from google.oauth2 import id_token as google_id_token
 from google.auth.transport.requests import Request as GoogleRequest
 
 from app.api.deps import get_current_user, get_db
+from app.api.v1.users.schemas import UserResponse
 from app.core.config import settings
 from app.core.security import create_access_token
 from sqlalchemy.orm import Session
@@ -157,7 +158,7 @@ def callback(
     return resp
 
 
-@router.get("/me")
+@router.get("/me", response_model=UserResponse)
 def me(user=Depends(get_current_user)):
     return user
 
