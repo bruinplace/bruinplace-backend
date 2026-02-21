@@ -1,5 +1,5 @@
 from pydantic import BaseModel
 
 
-class PropertyOut(BaseModel):
+class PropertyResponse(BaseModel):
     id: str

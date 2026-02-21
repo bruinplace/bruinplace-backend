@@ -28,3 +28,7 @@ class SoftDeleteBase(Base):
     __abstract__ = True
 
     deleted_at = Column(DateTime(timezone=True), nullable=True, default=None)
+
+    def soft_delete(self) -> None:
+        """Mark this instance as soft-deleted by setting deleted_at. Caller must commit the session."""
+        self.deleted_at = datetime.utcnow()
