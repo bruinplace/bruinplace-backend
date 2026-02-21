@@ -134,9 +134,13 @@ def get_listings(
     total = q.count()
     rows = q.order_by(Listing.created_at.desc()).offset(offset).limit(limit).all()
     listing_ids = [r.id for r in rows]
-    amenities_map = _amenities_for_listing_ids(db, listing_ids)
+    amenities_map = _amenities_for_listing_ids(db=db, listing_ids=listing_ids)
     items = [
-        _listing_to_out(listing, amenities_map.get(listing.id, [])) for listing in rows
+        _listing_to_out(
+            listing=listing,
+            amenities=amenities_map.get(listing.id, []),
+        )
+        for listing in rows
     ]
     return ListingListResponse(items=items, total=total)
 
@@ -155,8 +159,10 @@ def get_listing_by_id(db: Session, listing_id: UUID) -> Optional[ListingResponse
     if not listing:
         return None
 
-    amenities = _amenities_for_listing_ids(db, [listing.id]).get(listing.id, [])
-    return _listing_to_out(listing, amenities)
+    amenities = _amenities_for_listing_ids(db=db, listing_ids=[listing.id]).get(
+        listing.id, []
+    )
+    return _listing_to_out(listing=listing, amenities=amenities)
 
 
 def create_listing(db: Session, user_id: str, data: ListingCreate) -> ListingResponse:
@@ -199,8 +205,10 @@ def create_listing(db: Session, user_id: str, data: ListingCreate) -> ListingRes
     db.commit()
 
     db.refresh(listing)
-    amenities = _amenities_for_listing_ids(db, [listing.id]).get(listing.id, [])
-    return _listing_to_out(listing, amenities)
+    amenities = _amenities_for_listing_ids(db=db, listing_ids=[listing.id]).get(
+        listing.id, []
+    )
+    return _listing_to_out(listing=listing, amenities=amenities)
 
 
 def update_listing(
@@ -220,6 +228,7 @@ def update_listing(
     )
     if not listing or listing.user_id != user_id:
         return None
+
     update = data.model_dump(exclude_unset=True)
     amenity_ids = update.pop("amenity_ids", None)
     for key, value in update.items():
@@ -234,8 +243,10 @@ def update_listing(
     db.commit()
     db.refresh(listing)
 
-    amenities = _amenities_for_listing_ids(db, [listing.id]).get(listing.id, [])
-    return _listing_to_out(listing, amenities)
+    amenities = _amenities_for_listing_ids(db=db, listing_ids=[listing.id]).get(
+        listing.id, []
+    )
+    return _listing_to_out(listing=listing, amenities=amenities)
 
 
 def soft_delete_listing(db: Session, listing_id: UUID, user_id: str) -> bool:

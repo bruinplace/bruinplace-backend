@@ -37,7 +37,7 @@ def get_listings_controller(
     filters for status, unit type, rent range, property, text search, and
     availability date.
     """
-    return get_listings(db, **params.model_dump())
+    return get_listings(db=db, **params.model_dump())
 
 
 @router.get("/amenities", response_model=list[AmenityResponse])
@@ -47,7 +47,7 @@ def get_amenities_controller(db: Session = Depends(get_db)):
 
     Used by clients to show amenity options when creating or editing a listing.
     """
-    return list_amenities(db)
+    return list_amenities(db=db)
 
 
 @router.post("", response_model=ListingResponse, status_code=status.HTTP_201_CREATED)
@@ -62,7 +62,7 @@ def post_listing_controller(
     Requires authentication. The listing is tied to the given property_id;
     returns 404 if the property does not exist.
     """
-    return create_listing(db, user.id, payload)
+    return create_listing(db=db, user_id=user.id, data=payload)
 
 
 @router.get("/{listing_id}", response_model=ListingResponse)
@@ -75,7 +75,7 @@ def get_listing_controller(
 
     Returns 404 if the listing does not exist or has been soft-deleted.
     """
-    listing = get_listing_by_id(db, listing_id)
+    listing = get_listing_by_id(db=db, listing_id=listing_id)
     if not listing:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -97,7 +97,12 @@ def patch_listing_controller(
     Partial update: only provided fields are changed. Returns 404 if the listing
     does not exist, is soft-deleted, or the authenticated user is not the owner.
     """
-    listing = update_listing(db, listing_id, user.id, payload)
+    listing = update_listing(
+        db=db,
+        listing_id=listing_id,
+        user_id=user.id,
+        data=payload,
+    )
     if not listing:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -118,7 +123,11 @@ def delete_listing_controller(
     Sets deleted_at so the listing is excluded from list/detail. Returns 404 if
     the listing does not exist, is already soft-deleted, or the user is not owner.
     """
-    deleted = soft_delete_listing(db, listing_id, user.id)
+    deleted = soft_delete_listing(
+        db=db,
+        listing_id=listing_id,
+        user_id=user.id,
+    )
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
