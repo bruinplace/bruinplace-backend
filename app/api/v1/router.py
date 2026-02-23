@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from app.api.v1.auth.controller import router as auth_router
 from app.api.v1.listings.controllers import router as listings_router
-from app.api.v1.properties.controller import router as properties_router
+from app.api.v1.properties.controllers import router as properties_router
 from app.api.v1.reviews.controller import router as reviews_router
 from app.api.v1.test.controller import router as test_router
 from app.api.v1.users.controller import router as users_router
