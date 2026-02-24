@@ -10,6 +10,7 @@ class Property(SoftDeleteBase):
     __tablename__ = "properties"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    # This refers to the user who added the property; set to a system user if imported
     owner_id = Column(
         String,
         ForeignKey("users.id", ondelete="CASCADE"),
