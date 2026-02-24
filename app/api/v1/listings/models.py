@@ -45,7 +45,13 @@ class Listing(SoftDeleteBase):
         ForeignKey("properties.id", ondelete="CASCADE"),
         nullable=False,
     )
-    user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    # This refers to the user who added the listing; set to a system user if imported
+    owner_id = Column(
+        String,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        comment="User ID of the listing owner",
+    )
 
     title = Column(Text, nullable=False)
     description = Column(Text, nullable=False)
