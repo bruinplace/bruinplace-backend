@@ -1,7 +1,7 @@
 """Seed the database with apartment data from a UniShack JSON export.
 
 Usage:
-    uv run python scripts/seed_unishack.py <path-to-unishack.json>
+    uv run python scripts/run_script.py seed_unishack <path-to-unishack.json>
 
 The script reads .env via the app's config, so no extra DB setup is needed.
 """
@@ -12,8 +12,8 @@ import sys
 
 from app.api.v1.listings.models import Listing, ListingStatus, UnitType
 from app.api.v1.properties.models import Property
-from app.api.v1.users.models import User
 from app.db.session import SessionLocal
+from scripts.script_user import SCRIPT_USER_ID, ensure_script_user
 
 # UCLA-area defaults for fields missing from the scraped data
 DEFAULTS = {
@@ -24,10 +24,6 @@ DEFAULTS = {
     "latitude": 34.0689,
     "longitude": -118.4452,
 }
-
-SEED_USER_ID = "seed-import"
-SEED_USER_EMAIL = "seed@bruinplace.dev"
-SEED_USER_NAME = "Seed Import"
 
 UNIT_TYPE_MAP: dict[str, UnitType] = {
     "double": UnitType.SHARED_ROOM,
@@ -59,16 +55,14 @@ def seed(json_path: str) -> None:
 
     db = SessionLocal()
     try:
-        # Ensure seed user exists
-        if not db.get(User, SEED_USER_ID):
-            db.add(User(id=SEED_USER_ID, email=SEED_USER_EMAIL, name=SEED_USER_NAME))
-            db.flush()
+        ensure_script_user(db)
 
         property_count = 0
         listing_count = 0
 
         for apt in apartments:
             prop = Property(
+                owner_id=SCRIPT_USER_ID,
                 name=apt["name"],
                 address=apt["name"],  # real address not available in scraped data
                 postal_code=DEFAULTS["postal_code"],
@@ -85,7 +79,7 @@ def seed(json_path: str) -> None:
             for unit in apt.get("units", []):
                 listing = Listing(
                     property_id=prop.id,
-                    user_id=SEED_USER_ID,
+                    owner_id=SCRIPT_USER_ID,
                     title=f"{apt['name']} - {unit.get('unit_type', 'Unit')}",
                     description=apt.get("address_meta", ""),
                     monthly_rent=parse_price(unit.get("price", "0")),
@@ -106,6 +100,8 @@ def seed(json_path: str) -> None:
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: uv run python scripts/seed_unishack.py <path-to-unishack.json>")
+        print(
+            "Usage: uv run python scripts/run_script.py seed_unishack <path-to-unishack.json>"
+        )
         sys.exit(1)
     seed(sys.argv[1])
