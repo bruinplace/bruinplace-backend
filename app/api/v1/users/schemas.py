@@ -12,8 +12,6 @@ class UserResponse(BaseModel):
     email: str
     name: Optional[str] = None
     profile_picture: Optional[str] = None
-    created_at: datetime
-    last_login: datetime
 
     class Config:
         from_attributes = True
