@@ -152,9 +152,10 @@ def callback(
         httponly=True,
         samesite="lax",
         secure=(settings.ENVIRONMENT == "production"),
+        path="/",
     )
     # Clear one-time oauth state cookie
-    resp.delete_cookie("oauth_state")
+    resp.delete_cookie("oauth_state", path="/")
     return resp
 
 
@@ -166,6 +167,7 @@ def me(user=Depends(get_current_user)):
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 def logout(response: Response):
     # Clear session and transient oauth cookies
-    response.delete_cookie("bp_session")
-    response.delete_cookie("oauth_state")
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    response.delete_cookie("bp_session", path="/")
+    response.delete_cookie("oauth_state", path="/")
+    response.status_code = status.HTTP_204_NO_CONTENT
+    return response
