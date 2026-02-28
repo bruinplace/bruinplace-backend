@@ -64,11 +64,11 @@ def seed(json_path: str) -> None:
             prop = Property(
                 owner_id=SCRIPT_USER_ID,
                 name=apt["name"],
-                address=apt.get("address", apt["name"]),
-                postal_code=apt.get("postal_code", "90024"),
-                city=apt.get("city", "Los Angeles"),
-                state=apt.get("state", "CA"),
-                country=apt.get("country", "US"),
+                address=apt.get("address") or apt["name"],
+                postal_code=apt.get("postal_code") or "90024",
+                city=apt.get("city") or "Los Angeles",
+                state=apt.get("state") or "CA",
+                country=apt.get("country") or "US",
                 latitude=DEFAULT_LATITUDE,
                 longitude=DEFAULT_LONGITUDE,
             )
