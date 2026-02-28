@@ -12,6 +12,7 @@ from app.api.v1.listings.models import (
     ListingAmenity,
     ListingStatus,
     UnitType,
+    SavedListing,
 )
 from app.api.v1.listings.schemas import (
     AmenityResponse,
@@ -64,7 +65,8 @@ def _listing_to_out(
     return ListingResponse(
         id=listing.id,
         property_id=listing.property_id,
-        user_id=listing.user_id,
+        # Backward compatibility: schemas expect `user_id` though model uses `owner_id`.
+        user_id=getattr(listing, "user_id", None) or getattr(listing, "owner_id"),
         title=listing.title,
         description=listing.description,
         monthly_rent=listing.monthly_rent,
@@ -265,5 +267,75 @@ def soft_delete_listing(db: Session, listing_id: UUID, user_id: str) -> bool:
     if not listing or listing.user_id != user_id:
         return False
     listing.soft_delete()
+    db.commit()
+    return True
+
+
+def get_saved_listings(
+    db: Session, *, user_id: str, limit: int = 20, offset: int = 0
+) -> ListingListResponse:
+    """
+    Return listings saved by the given user, including amenities.
+
+    Excludes soft-deleted listings. Ordered by when the listing was created
+    (desc) to match general listing ordering.
+    """
+    q = (
+        db.query(Listing)
+        .join(SavedListing, SavedListing.listing_id == Listing.id)
+        .where(
+            SavedListing.user_id == user_id,
+            Listing.deleted_at.is_(None),
+        )
+    )
+    total = q.count()
+    rows = q.order_by(Listing.created_at.desc()).offset(offset).limit(limit).all()
+    listing_ids = [r.id for r in rows]
+    amenities_map = _amenities_for_listing_ids(db=db, listing_ids=listing_ids)
+    items = [
+        _listing_to_out(listing=listing, amenities=amenities_map.get(listing.id, []))
+        for listing in rows
+    ]
+    return ListingListResponse(items=items, total=total)
+
+
+def save_listing_for_user(db: Session, *, user_id: str, listing_id: UUID) -> bool:
+    """Save a listing for a user. Returns True if created, False if already saved."""
+    # Ensure listing exists and is not soft-deleted
+    listing = (
+        db.query(Listing)
+        .where(Listing.id == listing_id, Listing.deleted_at.is_(None))
+        .first()
+    )
+    if not listing:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Listing not found"
+        )
+
+    exists = (
+        db.query(SavedListing)
+        .where(
+            SavedListing.user_id == user_id,
+            SavedListing.listing_id == listing_id,
+        )
+        .first()
+        is not None
+    )
+    if exists:
+        return False
+
+    db.add(SavedListing(user_id=user_id, listing_id=listing_id))
+    db.commit()
+    return True
+
+
+def unsave_listing_for_user(db: Session, *, user_id: str, listing_id: UUID) -> bool:
+    """Remove a saved listing. Returns True if deleted, False if not present."""
+    q = db.query(SavedListing).where(
+        SavedListing.user_id == user_id, SavedListing.listing_id == listing_id
+    )
+    if q.first() is None:
+        return False
+    q.delete(synchronize_session=False)
     db.commit()
     return True
