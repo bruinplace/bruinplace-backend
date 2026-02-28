@@ -15,15 +15,9 @@ from app.api.v1.properties.models import Property
 from app.db.session import SessionLocal
 from scripts.script_user import SCRIPT_USER_ID, ensure_script_user
 
-# UCLA-area defaults for fields missing from the scraped data
-DEFAULTS = {
-    "postal_code": "90024",
-    "city": "Los Angeles",
-    "state": "CA",
-    "country": "US",
-    "latitude": 34.0689,
-    "longitude": -118.4452,
-}
+# UCLA campus coordinates — used as default since the JSON lacks lat/lng
+DEFAULT_LATITUDE = 34.0689
+DEFAULT_LONGITUDE = -118.4452
 
 UNIT_TYPE_MAP: dict[str, UnitType] = {
     "double": UnitType.SHARED_ROOM,
@@ -34,9 +28,15 @@ UNIT_TYPE_MAP: dict[str, UnitType] = {
 
 
 def parse_price(raw: str) -> int:
-    """Extract integer rent from strings like '$ 1050 +/mo'."""
+    """Extract integer dollar amount from strings like '$ 1050 +/mo' or '$600 deposit'."""
     digits = re.sub(r"[^\d]", "", raw)
     return int(digits) if digits else 0
+
+
+def parse_int(raw: str) -> int | None:
+    """Extract the first integer from a string like '3 Month Lease' or 'up to 3 residents'."""
+    match = re.search(r"\d+", raw)
+    return int(match.group()) if match else None
 
 
 def map_unit_type(raw: str) -> UnitType:
@@ -64,13 +64,13 @@ def seed(json_path: str) -> None:
             prop = Property(
                 owner_id=SCRIPT_USER_ID,
                 name=apt["name"],
-                address=apt["name"],  # real address not available in scraped data
-                postal_code=DEFAULTS["postal_code"],
-                city=DEFAULTS["city"],
-                state=DEFAULTS["state"],
-                country=DEFAULTS["country"],
-                latitude=DEFAULTS["latitude"],
-                longitude=DEFAULTS["longitude"],
+                address=apt.get("address", apt["name"]),
+                postal_code=apt.get("postal_code", "90024"),
+                city=apt.get("city", "Los Angeles"),
+                state=apt.get("state", "CA"),
+                country=apt.get("country", "US"),
+                latitude=DEFAULT_LATITUDE,
+                longitude=DEFAULT_LONGITUDE,
             )
             db.add(prop)
             db.flush()  # assigns prop.id
@@ -83,6 +83,9 @@ def seed(json_path: str) -> None:
                     title=f"{apt['name']} - {unit.get('unit_type', 'Unit')}",
                     description=apt.get("address_meta", ""),
                     monthly_rent=parse_price(unit.get("price", "0")),
+                    deposit_amount=parse_price(unit["deposit_amount"]) if unit.get("deposit_amount") else None,
+                    lease_term_months=parse_int(unit["lease_term_months"]) if unit.get("lease_term_months") else None,
+                    max_occupants=parse_int(unit["max_occupants"]) if unit.get("max_occupants") else None,
                     unit_type=map_unit_type(unit.get("unit_type", "")),
                     status=map_status(unit.get("availability", "")),
                 )
