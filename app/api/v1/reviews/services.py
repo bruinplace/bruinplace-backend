@@ -1,4 +1,3 @@
-from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException, status
@@ -6,7 +5,11 @@ from sqlalchemy.orm import Session
 
 from app.api.v1.properties.models import Property
 from app.api.v1.reviews.models import Review
-from app.api.v1.reviews.schemas import ReviewCreate, ReviewResponse, ReviewUpdate
+from app.api.v1.reviews.schemas import (
+    ReviewCreate,
+    ReviewResponse,
+    ReviewUpdate,
+)
 
 
 def _get_property_or_404(db: Session, property_id: UUID) -> None:
@@ -20,10 +23,6 @@ def _get_property_or_404(db: Session, property_id: UUID) -> None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Property not found"
         )
-
-
-def _to_review_response(row: Review) -> ReviewResponse:
-    return ReviewResponse.model_validate(row)
 
 
 def create_review(
@@ -51,7 +50,7 @@ def create_review(
     db.add(row)
     db.commit()
     db.refresh(row)
-    return _to_review_response(row)
+    return ReviewResponse.model_validate(row)
 
 
 def get_review_by_id(db: Session, *, review_id: UUID) -> ReviewResponse:
@@ -60,7 +59,7 @@ def get_review_by_id(db: Session, *, review_id: UUID) -> ReviewResponse:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Review not found"
         )
-    return _to_review_response(row)
+    return ReviewResponse.model_validate(row)
 
 
 def update_review(
@@ -82,7 +81,7 @@ def update_review(
         setattr(row, k, v)
     db.commit()
     db.refresh(row)
-    return _to_review_response(row)
+    return ReviewResponse.model_validate(row)
 
 
 def delete_review(db: Session, *, review_id: UUID, user_id: str) -> None:
@@ -98,4 +97,3 @@ def delete_review(db: Session, *, review_id: UUID, user_id: str) -> None:
         )
     db.delete(row)
     db.commit()
-

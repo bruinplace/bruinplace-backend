@@ -1,7 +1,11 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
-from app.api.v1.reviews.schemas import ReviewCreate, ReviewResponse, ReviewUpdate
+from app.api.v1.reviews.schemas import (
+    ReviewCreate,
+    ReviewResponse,
+    ReviewUpdate,
+)
 from app.api.v1.reviews.services import (
     create_review,
     delete_review,
