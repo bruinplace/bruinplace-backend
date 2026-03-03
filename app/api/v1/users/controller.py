@@ -28,16 +28,12 @@ def patch_me(
     db: Session = Depends(get_db),
 ) -> UserResponse:
     """Update editable fields on the current user's profile."""
-    current = db.get(User, user.id)
-    if current is None:
-        # Should not happen if get_current_user succeeded, but handle gracefully
-        return user
     update = payload.model_dump(exclude_unset=True)
     for k, v in update.items():
-        setattr(current, k, v)
+        setattr(user, k, v)
     db.commit()
-    db.refresh(current)
-    return current
+    db.refresh(user)
+    return user
 
 
 @router.get("/saved-listings", response_model=ListingListResponse)

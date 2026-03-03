@@ -28,4 +28,4 @@ class UserUpdate(BaseModel):
     """Editable fields for the current user's profile."""
 
     name: str | None = Field(None, min_length=1, max_length=255)
-    profile_picture: str | None = None
+    profile_picture: Optional[str] = None
