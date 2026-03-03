@@ -35,6 +35,17 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
+    # S3 object storage
+    AWS_REGION: str = "us-east-2"
+    # Optional manual AWS credentials for local/dev use
+    # If unset, boto3 falls back to its default credential provider chain
+    AWS_ACCESS_KEY_ID: Optional[str] = None
+    AWS_SECRET_ACCESS_KEY: Optional[str] = None
+    AWS_SESSION_TOKEN: Optional[str] = None
+
+    S3_BUCKET_NAME: Optional[str] = None
+    S3_PRESIGNED_URL_EXPIRES_SECONDS: int = 600
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
