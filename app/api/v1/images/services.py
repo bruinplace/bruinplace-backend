@@ -1,14 +1,23 @@
-import mimetypes
 import uuid
 from uuid import UUID
 
-import boto3
-from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import HTTPException, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from app.api.v1.images.models import ListingImage, PropertyImage
+from app.api.v1.images.exceptions import S3Error, S3ObjectNotFoundError
+from app.api.v1.images.s3_utils import (
+    assert_object_exists,
+    build_s3_url,
+    build_storage_key_for_listing,
+    build_storage_key_for_property,
+    delete_object,
+    extension_from_filename_or_content_type,
+    generate_presigned_put_url,
+    listing_images_prefix,
+    property_images_prefix,
+)
 from app.api.v1.images.schemas import (
     BulkImageFinalizeRequest,
     BulkImageUploadUrlsRequest,
@@ -22,15 +31,6 @@ from app.api.v1.images.schemas import (
 from app.api.v1.listings.models import Listing
 from app.api.v1.properties.models import Property
 from app.core.config import settings
-
-
-s3_client = boto3.client(
-    "s3",
-    region_name=settings.AWS_REGION,
-    aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-    aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-    endpoint_url=f"https://s3.{settings.AWS_REGION}.amazonaws.com",
-)
 
 
 def _validate_s3_settings() -> None:
@@ -64,24 +64,6 @@ def _require_listing(db: Session, listing_id: UUID) -> Listing:
     return listing
 
 
-def _extension_from_filename_or_content_type(filename: str, content_type: str) -> str:
-    """Infer file extension from filename first, then MIME type."""
-    ext = filename.rsplit(".", 1)[-1].strip().lower() if "." in filename else ""
-    if ext:
-        return ext
-    guessed = mimetypes.guess_extension(content_type) or ""
-    guessed = guessed.lstrip(".")
-    return guessed or "bin"
-
-
-def _public_url_for_key(storage_key: str) -> str:
-    """Build a public/read URL for a storage key."""
-    return (
-        f"https://{settings.S3_BUCKET_NAME}.s3."
-        f"{settings.AWS_REGION}.amazonaws.com/{storage_key}"
-    )
-
-
 def _next_display_order(
     db: Session, image_model, parent_column, parent_id: UUID
 ) -> int:
@@ -109,27 +91,14 @@ def _list_images(
 
 
 def _build_upload_url_response(
-    payload: ImageUploadUrlRequest,
-    storage_key: str,
+    image_id: UUID, storage_key: str, content_type: str
 ) -> ImageUploadUrlResponse:
-    """Create image_id/storage_key pair and return upload URL payload."""
-    image_id = uuid.uuid4()
-    extension = _extension_from_filename_or_content_type(
-        filename=payload.filename,
-        content_type=payload.content_type,
-    )
-    storage_key = f"{storage_key}{image_id}.{extension}"
+    """Build the upload URL response given a pre-computed image_id and storage_key."""
     try:
-        upload_url = s3_client.generate_presigned_url(
-            ClientMethod="put_object",
-            Params={
-                "Bucket": settings.S3_BUCKET_NAME,
-                "Key": storage_key,
-                "ContentType": payload.content_type,
-            },
-            ExpiresIn=settings.S3_PRESIGNED_URL_EXPIRES_SECONDS,
+        upload_url = generate_presigned_put_url(
+            key=storage_key, content_type=content_type
         )
-    except (ClientError, BotoCoreError) as exc:
+    except S3Error as exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail="Failed to generate upload URL",
@@ -139,40 +108,34 @@ def _build_upload_url_response(
         image_id=image_id,
         storage_key=storage_key,
         upload_url=upload_url,
-        required_headers={"Content-Type": payload.content_type},
+        required_headers={"Content-Type": content_type},
         expires_in_seconds=settings.S3_PRESIGNED_URL_EXPIRES_SECONDS,
     )
 
 
 def _assert_s3_object_exists(storage_key: str) -> None:
-    """Validate that an uploaded object exists in S3."""
+    """Validate that an uploaded object exists in S3; raises HTTPException on failure."""
     _validate_s3_settings()
     try:
-        s3_client.head_object(Bucket=settings.S3_BUCKET_NAME, Key=storage_key)
-    except ClientError as exc:
-        code = exc.response.get("Error", {}).get("Code", "")
-        if code in {"404", "NoSuchKey", "NotFound"}:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Uploaded object was not found in storage",
-            ) from exc
+        assert_object_exists(storage_key)
+    except S3ObjectNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Uploaded object was not found in storage",
+        ) from exc
+    except S3Error as exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail="Storage provider error while validating upload",
         ) from exc
-    except BotoCoreError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="Storage provider is unavailable",
-        ) from exc
 
 
 def _delete_s3_object(storage_key: str) -> None:
-    """Delete an object from S3 by storage key."""
+    """Delete an object from S3 by storage key; raises HTTPException on failure."""
     _validate_s3_settings()
     try:
-        s3_client.delete_object(Bucket=settings.S3_BUCKET_NAME, Key=storage_key)
-    except (ClientError, BotoCoreError) as exc:
+        delete_object(storage_key)
+    except S3Error as exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail="Failed to delete object from storage",
@@ -244,7 +207,7 @@ def _delete_image_row(
 
 def get_property_images(db: Session, property_id: UUID) -> ImageListResponse:
     """Return all images attached to a property."""
-    _require_property(db, property_id)
+    _require_property(db=db, property_id=property_id)
     return _list_images(
         db=db,
         image_model=PropertyImage,
@@ -255,7 +218,7 @@ def get_property_images(db: Session, property_id: UUID) -> ImageListResponse:
 
 def get_listing_images(db: Session, listing_id: UUID) -> ImageListResponse:
     """Return all images attached to a listing."""
-    _require_listing(db, listing_id)
+    _require_listing(db=db, listing_id=listing_id)
     return _list_images(
         db=db,
         image_model=ListingImage,
@@ -269,10 +232,16 @@ def create_property_upload_url(
 ) -> ImageUploadUrlResponse:
     """Generate one pre-signed upload URL for a property image."""
     _validate_s3_settings()
-    _require_property(db, property_id)
+    _require_property(db=db, property_id=property_id)
+    image_id = uuid.uuid4()
+    ext = extension_from_filename_or_content_type(
+        filename=payload.filename, content_type=payload.content_type
+    )
+    storage_key = build_storage_key_for_property(
+        property_id=property_id, image_id=image_id, ext=ext
+    )
     return _build_upload_url_response(
-        payload=payload,
-        storage_key=f"properties/{property_id}/images/",
+        image_id=image_id, storage_key=storage_key, content_type=payload.content_type
     )
 
 
@@ -292,10 +261,19 @@ def create_listing_upload_url(
 ) -> ImageUploadUrlResponse:
     """Generate one pre-signed upload URL for a listing image."""
     _validate_s3_settings()
-    listing = _require_listing(db, listing_id)
+    listing = _require_listing(db=db, listing_id=listing_id)
+    image_id = uuid.uuid4()
+    ext = extension_from_filename_or_content_type(
+        filename=payload.filename, content_type=payload.content_type
+    )
+    storage_key = build_storage_key_for_listing(
+        property_id=listing.property_id,
+        listing_id=listing_id,
+        image_id=image_id,
+        ext=ext,
+    )
     return _build_upload_url_response(
-        payload=payload,
-        storage_key=(f"properties/{listing.property_id}/listings/{listing_id}/images/"),
+        image_id=image_id, storage_key=storage_key, content_type=payload.content_type
     )
 
 
@@ -314,9 +292,9 @@ def finalize_property_image(
     db: Session, property_id: UUID, payload: ImageFinalizeRequest
 ) -> ImageResponse:
     """Finalize one uploaded property image and persist metadata."""
-    _require_property(db, property_id)
+    _require_property(db=db, property_id=property_id)
 
-    expected_prefix = f"properties/{property_id}/images/"
+    expected_prefix = property_images_prefix(property_id)
     if not payload.storage_key.startswith(expected_prefix):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -342,7 +320,7 @@ def finalize_property_image(
         id=payload.image_id,
         property_id=property_id,
         storage_key=payload.storage_key,
-        url=_public_url_for_key(payload.storage_key),
+        url=build_s3_url(payload.storage_key),
         display_order=payload.display_order
         if payload.display_order is not None
         else _next_display_order(
@@ -370,9 +348,11 @@ def finalize_listing_image(
     db: Session, listing_id: UUID, payload: ImageFinalizeRequest
 ) -> ImageResponse:
     """Finalize one uploaded listing image and persist metadata."""
-    listing = _require_listing(db, listing_id)
+    listing = _require_listing(db=db, listing_id=listing_id)
 
-    expected_prefix = f"properties/{listing.property_id}/listings/{listing_id}/images/"
+    expected_prefix = listing_images_prefix(
+        property_id=listing.property_id, listing_id=listing_id
+    )
     if not payload.storage_key.startswith(expected_prefix):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -399,7 +379,7 @@ def finalize_listing_image(
         listing_id=listing_id,
         property_id=listing.property_id,
         storage_key=payload.storage_key,
-        url=_public_url_for_key(payload.storage_key),
+        url=build_s3_url(payload.storage_key),
         display_order=payload.display_order
         if payload.display_order is not None
         else _next_display_order(
