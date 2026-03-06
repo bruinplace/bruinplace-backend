@@ -19,3 +19,9 @@ def sample():
         ],
         "message": "Sample data for testing",
     }
+
+
+@router.get("/health")
+def health():
+    """Health check endpoint."""
+    return {"status": "ok"}
