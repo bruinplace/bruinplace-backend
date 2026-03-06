@@ -19,7 +19,6 @@ jobs:
           script: |
             cd /home/${{ secrets.SSH_USERNAME }}/bruinplace-backend
             git pull origin main
-            source .venv/bin/activate
             uv sync
             sudo systemctl restart bruinplace
             sudo systemctl restart nginx
