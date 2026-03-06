@@ -71,10 +71,16 @@ def seed_images(json_path: str) -> None:
             for display_order, image_url in enumerate(image_urls):
                 try:
                     # Download the image
-                    req = Request(image_url)
+                    req = Request(image_url, headers={"User-Agent": "BruinPlace/1.0"})
                     resp = urlopen(req, timeout=30)  # noqa: S310
                     image_bytes = resp.read()
-                    content_type = resp.headers.get("Content-Type", "image/webp")
+                    content_type = resp.headers.get("Content-Type")
+
+                    # Skip if no Content-Type or not an image
+                    if not content_type or not content_type.startswith("image/"):
+                        print(f"  SKIP (not an image): {name} [{display_order}] -- Content-Type: {content_type}")
+                        skipped += 1
+                        continue
 
                     # Derive filename from URL for extension detection
                     filename = image_url.rsplit("/", 1)[-1]
