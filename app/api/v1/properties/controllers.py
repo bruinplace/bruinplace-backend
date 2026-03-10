@@ -3,7 +3,8 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_db
+from app.api.deps import get_current_user, get_db
+from app.api.v1.users.models import User
 from app.api.v1.properties.schemas import (
     PropertyCreate,
     PropertyDetailResponse,
@@ -28,9 +29,6 @@ from app.api.v1.properties.services import (
 
 router = APIRouter()
 
-# TODO: Restrict write access with auth/authorization rules.
-# For now, create/update/delete are intentionally open to all users
-
 
 @router.get("", response_model=PropertyListResponse)
 def get_properties_controller(
@@ -45,9 +43,10 @@ def get_properties_controller(
 def post_property_controller(
     payload: PropertyCreate,
     db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
 ):
     """Create a property."""
-    return create_property(db=db, data=payload)
+    return create_property(db=db, data=payload, user_id=user.id)
 
 
 @router.get("/{property_id}", response_model=PropertyDetailResponse)
@@ -64,11 +63,13 @@ def patch_property_controller(
     property_id: UUID,
     payload: PropertyUpdate,
     db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
 ):
     """Partially update a property."""
     return update_property(
         db=db,
         property_id=property_id,
+        user_id=user.id,
         data=payload,
     )
 
@@ -77,9 +78,10 @@ def patch_property_controller(
 def delete_property_controller(
     property_id: UUID,
     db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
 ):
     """Soft-delete a property."""
-    soft_delete_property(db=db, property_id=property_id)
+    soft_delete_property(db=db, property_id=property_id, user_id=user.id)
 
 
 @router.get("/{property_id}/listings", response_model=PropertyListingsResponse)

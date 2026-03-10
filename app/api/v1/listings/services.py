@@ -65,8 +65,8 @@ def _listing_to_out(
     return ListingResponse(
         id=listing.id,
         property_id=listing.property_id,
-        # Backward compatibility: schemas expect `user_id` though model uses `owner_id`.
-        user_id=getattr(listing, "user_id", None) or getattr(listing, "owner_id"),
+        # Schema still exposes user_id; map from model owner_id.
+        user_id=listing.owner_id,
         title=listing.title,
         description=listing.description,
         monthly_rent=listing.monthly_rent,
@@ -185,7 +185,7 @@ def create_listing(db: Session, user_id: str, data: ListingCreate) -> ListingRes
         )
     listing = Listing(
         property_id=data.property_id,
-        user_id=user_id,
+        owner_id=user_id,
         title=data.title,
         description=data.description,
         monthly_rent=data.monthly_rent,
@@ -228,7 +228,7 @@ def update_listing(
         .where(and_(Listing.id == listing_id, Listing.deleted_at.is_(None)))
         .first()
     )
-    if not listing or listing.user_id != user_id:
+    if not listing or listing.owner_id != user_id:
         return None
 
     update = data.model_dump(exclude_unset=True)
@@ -264,7 +264,7 @@ def soft_delete_listing(db: Session, listing_id: UUID, user_id: str) -> bool:
         .where(and_(Listing.id == listing_id, Listing.deleted_at.is_(None)))
         .first()
     )
-    if not listing or listing.user_id != user_id:
+    if not listing or listing.owner_id != user_id:
         return False
     listing.soft_delete()
     db.commit()

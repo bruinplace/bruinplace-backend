@@ -160,9 +160,10 @@ def search_properties(db: Session, params: PropertySearchQuery) -> PropertyListR
     return PropertyListResponse(items=items, total=total)
 
 
-def create_property(db: Session, data: PropertyCreate) -> PropertyResponse:
+def create_property(db: Session, data: PropertyCreate, user_id: str) -> PropertyResponse:
     """Create a property."""
     property_obj = Property(
+        owner_id=user_id,
         name=data.name,
         address=data.address,
         postal_code=data.postal_code,
@@ -180,10 +181,15 @@ def create_property(db: Session, data: PropertyCreate) -> PropertyResponse:
 
 
 def update_property(
-    db: Session, property_id: UUID, data: PropertyUpdate
+    db: Session, property_id: UUID, user_id: str, data: PropertyUpdate
 ) -> PropertyResponse:
     """Update a property with partial fields."""
     property_obj = _get_property_or_404(db=db, property_id=property_id)
+    if property_obj.owner_id != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to update this property",
+        )
     update_data = data.model_dump(exclude_unset=True)
     for key, value in update_data.items():
         setattr(property_obj, key, value)
@@ -192,9 +198,14 @@ def update_property(
     return _to_property_response(property_obj=property_obj)
 
 
-def soft_delete_property(db: Session, property_id: UUID) -> None:
+def soft_delete_property(db: Session, property_id: UUID, user_id: str) -> None:
     """Soft-delete a property."""
     property_obj = _get_property_or_404(db=db, property_id=property_id)
+    if property_obj.owner_id != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to delete this property",
+        )
     property_obj.soft_delete()
     db.commit()
 
