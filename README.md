@@ -101,6 +101,7 @@ Required env vars (in addition to DB settings):
 - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
 - `GOOGLE_REDIRECT_URI` (e.g., `http://localhost:8000/api/v1/auth/callback`)
 - `FRONTEND_POST_LOGIN_URL` (where browser is redirected after successful OAuth callback, e.g., `http://localhost:3000/site`)
+- `CORS_ALLOW_ORIGINS` (optional CSV/JSON list override for CORS origins)
 - `ALLOWED_GOOGLE_HD` (comma-separated list, default: `ucla.edu,g.ucla.edu`)
 - `JWT_SECRET_KEY` (generate a strong secret)
 - `JWT_ALGORITHM` (default `HS256`)
@@ -108,6 +109,9 @@ Required env vars (in addition to DB settings):
 
 Notes:
 - Keep frontend/backend hostnames consistent during local dev (`localhost` vs `127.0.0.1`) so OAuth state and session cookies round-trip correctly.
+- If `CORS_ALLOW_ORIGINS` is unset, CORS defaults are environment-aware:
+  - `ENVIRONMENT=development`: `localhost/127.0.0.1` on ports `3000` and `5173`
+  - non-development: origin derived from `FRONTEND_POST_LOGIN_URL`
 
 ## Running the Application
 

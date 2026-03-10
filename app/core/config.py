@@ -2,6 +2,7 @@ import os
 import sys
 from typing import List, Optional
 import json
+from urllib.parse import urlparse
 
 from pydantic import ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -37,6 +38,9 @@ class Settings(BaseSettings):
 
     # Frontend redirect target after successful OAuth callback
     FRONTEND_POST_LOGIN_URL: str = "http://localhost:3000/site"
+    # Optional explicit CORS origins (CSV or JSON array). If unset, defaults are
+    # derived from ENVIRONMENT and FRONTEND_POST_LOGIN_URL.
+    CORS_ALLOW_ORIGINS: Optional[str] = None
 
     # S3 object storage
     AWS_REGION: str = "us-east-2"
@@ -67,7 +71,44 @@ class Settings(BaseSettings):
         raw = self.ALLOWED_GOOGLE_HD
         if not raw:
             return ["ucla.edu", "g.ucla.edu"]
+        return self._parse_str_list(raw)
+
+    @property
+    def cors_allow_origins(self) -> List[str]:
+        """
+        CORS origins used by FastAPI CORSMiddleware.
+
+        Priority:
+        1) CORS_ALLOW_ORIGINS (CSV/JSON)
+        2) Development defaults for local frontend hosts
+        3) FRONTEND_POST_LOGIN_URL origin (production-friendly default)
+        """
+        explicit = self._parse_str_list(self.CORS_ALLOW_ORIGINS)
+        if explicit:
+            return explicit
+
+        if self.ENVIRONMENT == "development":
+            return [
+                "http://localhost:3000",
+                "http://localhost:5173",
+                "http://127.0.0.1:3000",
+                "http://127.0.0.1:5173",
+            ]
+
+        parsed = urlparse(self.FRONTEND_POST_LOGIN_URL)
+        if parsed.scheme and parsed.netloc:
+            return [f"{parsed.scheme}://{parsed.netloc}"]
+
+        return []
+
+    @staticmethod
+    def _parse_str_list(raw: Optional[str]) -> List[str]:
+        """Parse JSON-array or CSV string into a string list."""
+        if not raw:
+            return []
         s = raw.strip()
+        if not s:
+            return []
         # Try JSON array first
         if s.startswith("[") and s.endswith("]"):
             try:
