@@ -11,8 +11,6 @@ from app.core.config import settings
 async def lifespan(app: FastAPI):
     """Application lifespan events."""
     # Startup
-    print("Using environment:", settings.ENVIRONMENT)
-    print("Using database:", settings.DATABASE_URL)
     # Auto-create tables in development for quick setup
     if settings.ENVIRONMENT == "development":
         DeclarativeBase.metadata.create_all(bind=engine)
