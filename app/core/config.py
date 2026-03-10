@@ -35,6 +35,9 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
+    # Frontend redirect target after successful OAuth callback
+    FRONTEND_POST_LOGIN_URL: str = "http://localhost:3000/site"
+
     # S3 object storage
     AWS_REGION: str = "us-east-2"
     # Optional manual AWS credentials for local/dev use

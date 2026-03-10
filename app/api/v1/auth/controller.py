@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 
 import requests
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
-from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi.responses import RedirectResponse
 from google.oauth2 import id_token as google_id_token
 from google.auth.transport.requests import Request as GoogleRequest
 
@@ -104,22 +104,31 @@ def callback(
 
     # Upsert user (JIT provisioning)
     user_id = idinfo.get("sub")
+    google_name = idinfo.get("name")
+    google_picture = idinfo.get("picture")
     existing: User | None = db.get(User, user_id)
     if existing:
         existing.email = email
-        existing.name = idinfo.get("name")
-        existing.profile_picture = idinfo.get("picture")
+        # Preserve user-edited profile fields across OAuth logins.
+        if not existing.name:
+            existing.name = google_name
+        if not existing.profile_picture:
+            existing.profile_picture = google_picture
         # Update last_login
         from datetime import datetime
 
         existing.last_login = datetime.utcnow()
+        effective_name = existing.name
+        effective_picture = existing.profile_picture
     else:
+        effective_name = google_name
+        effective_picture = google_picture
         db.add(
             User(
                 id=user_id,
                 email=email,
-                name=idinfo.get("name"),
-                profile_picture=idinfo.get("picture"),
+                name=effective_name,
+                profile_picture=effective_picture,
             )
         )
     db.commit()
@@ -128,8 +137,8 @@ def callback(
     payload = {
         "sub": user_id,
         "email": email,
-        "name": idinfo.get("name"),
-        "profile_picture": idinfo.get("picture"),
+        "name": effective_name,
+        "profile_picture": effective_picture,
     }
     access_token = create_access_token(
         payload,
@@ -138,13 +147,10 @@ def callback(
         expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
     )
 
-    # Return token and user info; also set HttpOnly session cookie for web clients
-    resp = JSONResponse(
-        {
-            "access_token": access_token,
-            "token_type": "bearer",
-            "user": payload,
-        }
+    # Set HttpOnly session cookie, then redirect browser back to frontend.
+    resp = RedirectResponse(
+        url=settings.FRONTEND_POST_LOGIN_URL,
+        status_code=status.HTTP_302_FOUND,
     )
     resp.set_cookie(
         key="bp_session",
