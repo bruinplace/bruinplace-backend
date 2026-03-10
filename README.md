@@ -93,17 +93,21 @@ Minimal Google OAuth flow that enforces UCLA domains via OIDC ID token verificat
 
 Endpoints:
 - `GET /api/v1/auth/login` → Redirects to Google
-- `GET /api/v1/auth/callback` → Exchanges code, verifies ID token, returns app JWT
+- `GET /api/v1/auth/callback` → Exchanges code, verifies ID token, sets `bp_session` HttpOnly cookie, redirects to frontend
 - `GET /api/v1/auth/me` → Current user (requires `Authorization: Bearer <token>`)
 - `POST /api/v1/auth/logout` → Clears transient OAuth state cookie
 
 Required env vars (in addition to DB settings):
 - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
 - `GOOGLE_REDIRECT_URI` (e.g., `http://localhost:8000/api/v1/auth/callback`)
+- `FRONTEND_POST_LOGIN_URL` (where browser is redirected after successful OAuth callback, e.g., `http://localhost:3000/site`)
 - `ALLOWED_GOOGLE_HD` (comma-separated list, default: `ucla.edu,g.ucla.edu`)
 - `JWT_SECRET_KEY` (generate a strong secret)
 - `JWT_ALGORITHM` (default `HS256`)
 - `ACCESS_TOKEN_EXPIRE_MINUTES` (default `60`)
+
+Notes:
+- Keep frontend/backend hostnames consistent during local dev (`localhost` vs `127.0.0.1`) so OAuth state and session cookies round-trip correctly.
 
 ## Running the Application
 

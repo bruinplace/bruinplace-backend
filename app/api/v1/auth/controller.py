@@ -40,7 +40,15 @@ def login():
         {k: v for k, v in params.items() if v is not None}
     )
     response = RedirectResponse(auth_url, status_code=status.HTTP_302_FOUND)
-    response.set_cookie("oauth_state", state, httponly=True, samesite="lax")
+    response.set_cookie(
+        "oauth_state",
+        state,
+        httponly=True,
+        samesite="lax",
+        secure=(settings.ENVIRONMENT == "production"),
+        path="/",
+        max_age=600,
+    )
     return response
 
 
