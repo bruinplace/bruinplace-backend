@@ -1,0 +1,239 @@
+Total rows in CSV: 46
+2026-03-10 18:24:00,980 INFO sqlalchemy.engine.Engine select pg_catalog.version()
+2026-03-10 18:24:00,980 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-03-10 18:24:01,111 INFO sqlalchemy.engine.Engine select current_schema()
+2026-03-10 18:24:01,111 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-03-10 18:24:01,233 INFO sqlalchemy.engine.Engine show standard_conforming_strings
+2026-03-10 18:24:01,234 INFO sqlalchemy.engine.Engine [raw sql] {}
+2026-03-10 18:24:01,372 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-03-10 18:24:01,379 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:01,380 INFO sqlalchemy.engine.Engine [generated in 0.00092s] {'id_1': '9a9c9fd8-2fa5-4907-9be5-31de72349931', 'param_1': 1}
+  UPDATE property_id='9a9c9fd8-2fa5-4907-9be5-31de72349931' name='Midvale Luxury Apartments' (34.0689, -118.4452) -> (34.06828712, -118.4537223)
+2026-03-10 18:24:01,518 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:01,518 INFO sqlalchemy.engine.Engine [cached since 0.1386s ago] {'id_1': 'd4a5612a-7b01-4fe6-aa75-df391c8bb4b8', 'param_1': 1}
+  UPDATE property_id='d4a5612a-7b01-4fe6-aa75-df391c8bb4b8' name='Midvale apts' (34.0689, -118.4452) -> (34.06828712, -118.4537223)
+2026-03-10 18:24:01,582 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:01,582 INFO sqlalchemy.engine.Engine [cached since 0.2035s ago] {'id_1': '4cc9fd3f-53b2-47d9-befc-fd3921ca11a3', 'param_1': 1}
+  UPDATE property_id='4cc9fd3f-53b2-47d9-befc-fd3921ca11a3' name='Lindbrook Apartments' (34.0689, -118.4452) -> (34.05963334, -118.4464795)
+2026-03-10 18:24:01,653 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:01,653 INFO sqlalchemy.engine.Engine [cached since 0.274s ago] {'id_1': '7f2a5ccd-9fce-4391-b632-afdbd3bf3833', 'param_1': 1}
+  UPDATE property_id='7f2a5ccd-9fce-4391-b632-afdbd3bf3833' name='Peaceful 23′ × 16′ (320\u202fsf) Large Private Room in Duplex' (34.0689, -118.4452) -> (34.0484473, -118.3774242)
+2026-03-10 18:24:01,721 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:01,722 INFO sqlalchemy.engine.Engine [cached since 0.3422s ago] {'id_1': '36c46821-fa97-4f86-8ff4-550662b21f9d', 'param_1': 1}
+  UPDATE property_id='36c46821-fa97-4f86-8ff4-550662b21f9d' name="Polly's Place" (34.0689, -118.4452) -> (34.08996869, -118.3164806)
+2026-03-10 18:24:01,790 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:01,795 INFO sqlalchemy.engine.Engine [cached since 0.4157s ago] {'id_1': '4df82daf-717b-4b67-8494-4df237cdb110', 'param_1': 1}
+  UPDATE property_id='4df82daf-717b-4b67-8494-4df237cdb110' name="Hai's room for rent" (34.0689, -118.4452) -> (34.03252918, -118.438801)
+2026-03-10 18:24:01,864 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:01,865 INFO sqlalchemy.engine.Engine [cached since 0.4857s ago] {'id_1': '06458532-ea0e-4ccb-b6ea-c40b05a3bdd8', 'param_1': 1}
+  UPDATE property_id='06458532-ea0e-4ccb-b6ea-c40b05a3bdd8' name='The Amara' (34.0689, -118.4452) -> (34.04503499, -118.456038)
+2026-03-10 18:24:01,937 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:01,937 INFO sqlalchemy.engine.Engine [cached since 0.5579s ago] {'id_1': '54316e79-cf01-496b-afef-a32d0d0ea7c1', 'param_1': 1}
+  UPDATE property_id='54316e79-cf01-496b-afef-a32d0d0ea7c1' name='The SW by CLG' (34.0689, -118.4452) -> (34.04196351, -118.4458862)
+2026-03-10 18:24:02,002 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:02,003 INFO sqlalchemy.engine.Engine [cached since 0.6238s ago] {'id_1': 'c9ac7ac7-f185-41c8-95ed-20f09bb259b7', 'param_1': 1}
+  UPDATE property_id='c9ac7ac7-f185-41c8-95ed-20f09bb259b7' name='Pico Eleven' (34.0689, -118.4452) -> (34.01452217, -118.4799392)
+2026-03-10 18:24:02,075 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:02,076 INFO sqlalchemy.engine.Engine [cached since 0.6971s ago] {'id_1': '2b2a3020-6f0d-47f6-9c9d-23b6f0ac2240', 'param_1': 1}
+  UPDATE property_id='2b2a3020-6f0d-47f6-9c9d-23b6f0ac2240' name='Sunset Barrington Gardens' (34.0689, -118.4452) -> (34.0638386, -118.4707837)
+  SKIP (no manual coords) property_id='bfb151af-0ea3-4734-b442-967185786110' name='Studio City, CA Apartments for Rent'
+  SKIP (no manual coords) property_id='238a94d5-e7ca-4713-a023-802fa85af39c' name='Sherman Oaks Apartments for Rent'
+  SKIP (no manual coords) property_id='1b6bebe6-2e16-4d60-902c-94af8cb693a6' name='Sherman Oaks, CA Houses for Rent'
+  SKIP (no manual coords) property_id='3f58c2db-c650-4d55-8b37-af14ecb5f700' name='Beverly Hills Apartments For Rent'
+  SKIP (no manual coords) property_id='a2006514-aed5-4965-8ae7-75d0148f26dc' name='Beverly Hills, CA'
+  SKIP (no manual coords) property_id='c8507417-89e7-4725-a2b3-7eb071f3de72' name='Studio City'
+  SKIP (no manual coords) property_id='4c411e7a-99d0-460a-a877-cbae5b37ac8c' name='Studio City, CA'
+2026-03-10 18:24:02,141 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:02,142 INFO sqlalchemy.engine.Engine [cached since 0.7627s ago] {'id_1': '6b635ee1-de9d-405f-a739-a1d8d258db9c', 'param_1': 1}
+  UPDATE property_id='6b635ee1-de9d-405f-a739-a1d8d258db9c' name='11510 Ohio Ave' (34.0689, -118.4452) -> (34.04747996, -118.4560004)
+2026-03-10 18:24:02,207 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:02,207 INFO sqlalchemy.engine.Engine [cached since 0.8284s ago] {'id_1': '3bdfc6ba-bd74-42f6-8097-ab8e3abfd9bd', 'param_1': 1}
+  UPDATE property_id='3bdfc6ba-bd74-42f6-8097-ab8e3abfd9bd' name='11611 Chenault St' (34.0689, -118.4452) -> (34.05834527, -118.4664668)
+2026-03-10 18:24:02,272 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:02,273 INFO sqlalchemy.engine.Engine [cached since 0.8934s ago] {'id_1': '74da9b46-cce1-4956-a129-23ddfd7235a0', 'param_1': 1}
+  UPDATE property_id='74da9b46-cce1-4956-a129-23ddfd7235a0' name='11908 Dorothy St' (34.0689, -118.4452) -> (34.05052158, -118.4698452)
+  SKIP (no manual coords) property_id='973a5046-0bcf-446a-9239-85dd694bd36f' name='Landfair'
+2026-03-10 18:24:02,341 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:02,341 INFO sqlalchemy.engine.Engine [cached since 0.9616s ago] {'id_1': 'dc812289-5d53-40f5-989f-806e279d9f7c', 'param_1': 1}
+  UPDATE property_id='dc812289-5d53-40f5-989f-806e279d9f7c' name='Hilgard 824' (34.0689, -118.4452) -> (34.06593042, -118.4390842)
+2026-03-10 18:24:02,408 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:02,408 INFO sqlalchemy.engine.Engine [cached since 1.029s ago] {'id_1': 'c2c14203-75ef-487c-a542-fafb9d11a67a', 'param_1': 1}
+  UPDATE property_id='c2c14203-75ef-487c-a542-fafb9d11a67a' name='Weyburn Terrace-Magnolia' (34.0689, -118.4452) -> (34.06344531, -118.4505759)
+2026-03-10 18:24:02,476 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:02,477 INFO sqlalchemy.engine.Engine [cached since 1.098s ago] {'id_1': 'aaa5bca6-0d0c-4dba-8442-2b3ffe2dc27b', 'param_1': 1}
+  UPDATE property_id='aaa5bca6-0d0c-4dba-8442-2b3ffe2dc27b' name='Levering Terrace' (34.0689, -118.4452) -> (34.06329512, -118.4490163)
+2026-03-10 18:24:02,546 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:02,547 INFO sqlalchemy.engine.Engine [cached since 1.168s ago] {'id_1': '85a182a4-7a59-4b47-b090-18f00bb7493a', 'param_1': 1}
+  UPDATE property_id='85a182a4-7a59-4b47-b090-18f00bb7493a' name='650 Landfair Ave.' (34.0689, -118.4452) -> (34.0664698, -118.4488608)
+2026-03-10 18:24:02,614 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:02,614 INFO sqlalchemy.engine.Engine [cached since 1.234s ago] {'id_1': '2a206233-c5ce-474e-a648-d93b90028a79', 'param_1': 1}
+  UPDATE property_id='2a206233-c5ce-474e-a648-d93b90028a79' name='555 Kelton' (34.0689, -118.4452) -> (34.06616753, -118.455714)
+2026-03-10 18:24:02,682 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:02,682 INFO sqlalchemy.engine.Engine [cached since 1.304s ago] {'id_1': 'bf236e14-f75e-4c41-8a63-c4070db3ed23', 'param_1': 1}
+  UPDATE property_id='bf236e14-f75e-4c41-8a63-c4070db3ed23' name='The Mission' (34.0689, -118.4452) -> (34.05543312, -118.4441648)
+2026-03-10 18:24:02,750 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:02,751 INFO sqlalchemy.engine.Engine [cached since 1.372s ago] {'id_1': 'aa5cbe35-e0b3-4328-a68f-da9064911d4c', 'param_1': 1}
+  UPDATE property_id='aa5cbe35-e0b3-4328-a68f-da9064911d4c' name='600 Kelton' (34.0689, -118.4452) -> (34.06612614, -118.4529759)
+2026-03-10 18:24:02,815 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:02,816 INFO sqlalchemy.engine.Engine [cached since 1.437s ago] {'id_1': '2157b97a-d0dd-48c5-a2fd-c0d715b6c878', 'param_1': 1}
+  UPDATE property_id='2157b97a-d0dd-48c5-a2fd-c0d715b6c878' name='Veteran Terrace' (34.0689, -118.4452) -> (34.05413615, -118.4433103)
+2026-03-10 18:24:02,881 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:02,883 INFO sqlalchemy.engine.Engine [cached since 1.503s ago] {'id_1': 'cfce7aa8-554f-42bc-92eb-d0e346f57636', 'param_1': 1}
+  UPDATE property_id='cfce7aa8-554f-42bc-92eb-d0e346f57636' name='10989 Roebling Ave' (34.0689, -118.4452) -> (34.06520709, -118.4496032)
+2026-03-10 18:24:02,948 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:02,949 INFO sqlalchemy.engine.Engine [cached since 1.57s ago] {'id_1': '79175b32-7f08-497c-aa5e-85037a20a799', 'param_1': 1}
+  UPDATE property_id='79175b32-7f08-497c-aa5e-85037a20a799' name='10987 Roebling Ave' (34.0689, -118.4452) -> (34.06522258, -118.449658)
+2026-03-10 18:24:03,017 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:03,018 INFO sqlalchemy.engine.Engine [cached since 1.639s ago] {'id_1': '33b7055f-674d-4037-a497-2a487cc8ce16', 'param_1': 1}
+  UPDATE property_id='33b7055f-674d-4037-a497-2a487cc8ce16' name='Midvale Arms' (34.0689, -118.4452) -> (34.05409254, -118.4413105)
+  SKIP (no manual coords) property_id='2e75e5ee-96fd-4073-b82c-53aa32db4b88' name='Felix'
+2026-03-10 18:24:03,087 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:03,087 INFO sqlalchemy.engine.Engine [cached since 1.708s ago] {'id_1': '24c3bda3-9af4-427b-8833-a50ba58e154b', 'param_1': 1}
+  UPDATE property_id='24c3bda3-9af4-427b-8833-a50ba58e154b' name='Keystone Ave Apartments' (34.0689, -118.4452) -> (34.02057582, -118.4062169)
+2026-03-10 18:24:03,155 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:03,156 INFO sqlalchemy.engine.Engine [cached since 1.777s ago] {'id_1': '3fe6cd99-2991-4e53-95a9-62b99da7ac2c', 'param_1': 1}
+  UPDATE property_id='3fe6cd99-2991-4e53-95a9-62b99da7ac2c' name='10780 Rochester' (34.0689, -118.4452) -> (34.0572739, -118.4385734)
+2026-03-10 18:24:03,221 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:03,223 INFO sqlalchemy.engine.Engine [cached since 1.843s ago] {'id_1': 'fd264e37-1326-441d-b841-341bea59d88b', 'param_1': 1}
+  UPDATE property_id='fd264e37-1326-441d-b841-341bea59d88b' name='Bellwood Apartments' (34.0689, -118.4452) -> (34.18185347, -118.5553695)
+2026-03-10 18:24:03,288 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:03,289 INFO sqlalchemy.engine.Engine [cached since 1.909s ago] {'id_1': '1b65bc13-d007-43fd-994c-b2b4969a63f0', 'param_1': 1}
+  UPDATE property_id='1b65bc13-d007-43fd-994c-b2b4969a63f0' name='Brent Manor Apartments' (34.0689, -118.4452) -> (34.04980225, -118.4584172)
+  SKIP (no manual coords) property_id='2034b2f4-4f33-4a58-8eab-5fe75a9532fa' name='Woodley Condo'
+2026-03-10 18:24:03,355 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:03,356 INFO sqlalchemy.engine.Engine [cached since 1.977s ago] {'id_1': '5ca2af3f-4f8d-4f85-8377-3d67455663b6', 'param_1': 1}
+  UPDATE property_id='5ca2af3f-4f8d-4f85-8377-3d67455663b6' name='Linea Unit 100' (34.0689, -118.4452) -> (34.03862765, -118.4354857)
+2026-03-10 18:24:03,426 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:03,427 INFO sqlalchemy.engine.Engine [cached since 2.048s ago] {'id_1': '24253a89-caab-4f9a-843f-be43d41f56b5', 'param_1': 1}
+  UPDATE property_id='24253a89-caab-4f9a-843f-be43d41f56b5' name='12035 Wilshire Blvd' (34.0689, -118.4452) -> (34.04554979, -118.4664582)
+2026-03-10 18:24:03,493 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:03,494 INFO sqlalchemy.engine.Engine [cached since 2.115s ago] {'id_1': 'f813d01e-a086-4472-af39-347be3751c3d', 'param_1': 1}
+  UPDATE property_id='f813d01e-a086-4472-af39-347be3751c3d' name='Laurel' (34.0689, -118.4452) -> (34.0637427, -118.4510708)
+2026-03-10 18:24:03,559 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:03,559 INFO sqlalchemy.engine.Engine [cached since 2.18s ago] {'id_1': 'cfd051bd-c9e5-436d-9da7-2299fed5db70', 'param_1': 1}
+  UPDATE property_id='cfd051bd-c9e5-436d-9da7-2299fed5db70' name='Weyburn Terrace-Aloe' (34.0689, -118.4452) -> (34.06359432, -118.4512906)
+2026-03-10 18:24:03,633 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:03,633 INFO sqlalchemy.engine.Engine [cached since 2.254s ago] {'id_1': '196f6121-bbbe-496f-b680-2b8421557f6a', 'param_1': 1}
+  UPDATE property_id='196f6121-bbbe-496f-b680-2b8421557f6a' name='Weyburn Terrace-Olive' (34.0689, -118.4452) -> (34.06216339, -118.4508432)
+2026-03-10 18:24:03,700 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:03,701 INFO sqlalchemy.engine.Engine [cached since 2.321s ago] {'id_1': 'e9b80612-0273-46a6-b380-a49c164ec19a', 'param_1': 1}
+  UPDATE property_id='e9b80612-0273-46a6-b380-a49c164ec19a' name='Club California' (34.0689, -118.4452) -> (34.06472462, -118.4490739)
+2026-03-10 18:24:03,766 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:03,767 INFO sqlalchemy.engine.Engine [cached since 2.388s ago] {'id_1': '6aaa2563-5e22-44c5-aabf-34dd88ad727e', 'param_1': 1}
+  UPDATE property_id='6aaa2563-5e22-44c5-aabf-34dd88ad727e' name='SW byCLG' (34.0689, -118.4452) -> (34.04114561, -118.4443091)
+2026-03-10 18:24:03,833 INFO sqlalchemy.engine.Engine SELECT properties.id AS properties_id, properties.owner_id AS properties_owner_id, properties.name AS properties_name, properties.address AS properties_address, properties.postal_code AS properties_postal_code, properties.city AS properties_city, properties.state AS properties_state, properties.country AS properties_country, properties.latitude AS properties_latitude, properties.longitude AS properties_longitude, properties.management_company AS properties_management_company, properties.deleted_at AS properties_deleted_at, properties.created_at AS properties_created_at, properties.updated_at AS properties_updated_at
+FROM properties
+WHERE properties.id = %(id_1)s::UUID
+ LIMIT %(param_1)s
+2026-03-10 18:24:03,833 INFO sqlalchemy.engine.Engine [cached since 2.454s ago] {'id_1': 'c4d77758-318c-4093-979d-f1f047a9b54d', 'param_1': 1}
+  UPDATE property_id='c4d77758-318c-4093-979d-f1f047a9b54d' name='1352 Carmelina Ave' (34.0689, -118.4452) -> (34.04017858, -118.4669549)
+2026-03-10 18:24:03,903 INFO sqlalchemy.engine.Engine UPDATE properties SET latitude=%(latitude)s, longitude=%(longitude)s, updated_at=%(updated_at)s WHERE properties.id = %(properties_id)s::UUID
+2026-03-10 18:24:03,903 INFO sqlalchemy.engine.Engine [generated in 0.00094s] [{'latitude': 34.04503499, 'longitude': -118.456038, 'updated_at': datetime.datetime(2026, 3, 11, 1, 24, 3, 902904), 'properties_id': UUID('06458532-ea0e-4ccb-b6ea-c40b05a3bdd8')}, {'latitude': 34.06216339, 'longitude': -118.4508432, 'updated_at': datetime.datetime(2026, 3, 11, 1, 24, 3, 902904), 'properties_id': UUID('196f6121-bbbe-496f-b680-2b8421557f6a')}, {'latitude': 34.04980225, 'longitude': -118.4584172, 'updated_at': datetime.datetime(2026, 3, 11, 1, 24, 3, 902904), 'properties_id': UUID('1b65bc13-d007-43fd-994c-b2b4969a63f0')}, {'latitude': 34.05413615, 'longitude': -118.4433103, 'updated_at': datetime.datetime(2026, 3, 11, 1, 24, 3, 902904), 'properties_id': UUID('2157b97a-d0dd-48c5-a2fd-c0d715b6c878')}, {'latitude': 34.04554979, 'longitude': -118.4664582, 'updated_at': datetime.datetime(2026, 3, 11, 1, 24, 3, 902904), 'properties_id': UUID('24253a89-caab-4f9a-843f-be43d41f56b5')}, {'latitude': 34.02057582, 'longitude': -118.4062169, 'updated_at': datetime.datetime(2026, 3, 11, 1, 24, 3, 902904), 'properties_id': UUID('24c3bda3-9af4-427b-8833-a50ba58e154b')}, {'latitude': 34.06616753, 'longitude': -118.455714, 'updated_at': datetime.datetime(2026, 3, 11, 1, 24, 3, 902904), 'properties_id': UUID('2a206233-c5ce-474e-a648-d93b90028a79')}, {'latitude': 34.0638386, 'longitude': -118.4707837, 'updated_at': datetime.datetime(2026, 3, 11, 1, 24, 3, 902904), 'properties_id': UUID('2b2a3020-6f0d-47f6-9c9d-23b6f0ac2240')}  ... displaying 10 of 36 total bound parameter sets ...  {'latitude': 34.0637427, 'longitude': -118.4510708, 'updated_at': datetime.datetime(2026, 3, 11, 1, 24, 3, 902904), 'properties_id': UUID('f813d01e-a086-4472-af39-347be3751c3d')}, {'latitude': 34.18185347, 'longitude': -118.5553695, 'updated_at': datetime.datetime(2026, 3, 11, 1, 24, 3, 902904), 'properties_id': UUID('fd264e37-1326-441d-b841-341bea59d88b')}]
+2026-03-10 18:24:06,267 INFO sqlalchemy.engine.Engine COMMIT
+
+Done. updated=36, skipped_no_coords=10, skipped_not_found=0
