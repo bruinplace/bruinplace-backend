@@ -213,8 +213,22 @@ def soft_delete_property(db: Session, property_id: UUID, user_id: str) -> None:
 def get_property_detail(db: Session, property_id: UUID) -> PropertyDetailResponse:
     """Get property details and aggregated review statistics."""
     property_obj = _get_property_or_404(db=db, property_id=property_id)
-    review_count, average_rating = (
-        db.query(func.count(Review.id), func.avg(Review.rating))
+    (
+        review_count,
+        average_rating,
+        average_management_rating,
+        average_cleanliness_rating,
+        average_noise_level_rating,
+        average_lease_flexibility_rating,
+    ) = (
+        db.query(
+            func.count(Review.id),
+            func.avg(Review.rating),
+            func.avg(Review.management_rating),
+            func.avg(Review.cleanliness_rating),
+            func.avg(Review.noise_level_rating),
+            func.avg(Review.lease_flexibility_rating),
+        )
         .where(Review.property_id == property_id)
         .one()
     )
@@ -236,6 +250,26 @@ def get_property_detail(db: Session, property_id: UUID) -> PropertyDetailRespons
             average_rating=(
                 round(float(average_rating), 2) if average_rating else None
             ),
+            average_management_rating=(
+                round(float(average_management_rating), 2)
+                if average_management_rating
+                else None
+            ),
+            average_cleanliness_rating=(
+                round(float(average_cleanliness_rating), 2)
+                if average_cleanliness_rating
+                else None
+            ),
+            average_noise_level_rating=(
+                round(float(average_noise_level_rating), 2)
+                if average_noise_level_rating
+                else None
+            ),
+            average_lease_flexibility_rating=(
+                round(float(average_lease_flexibility_rating), 2)
+                if average_lease_flexibility_rating
+                else None
+            ),
         ),
     )
 
@@ -245,14 +279,13 @@ def get_property_listings(
 ) -> PropertyListingsResponse:
     """Get listings associated with a property."""
     _get_property_or_404(db=db, property_id=property_id)
-    return PropertyListingsResponse.model_validate(
-        get_listings_for_property(
-            db=db,
-            property_id=property_id,
-            limit=limit,
-            offset=offset,
-        )
+    listings = get_listings_for_property(
+        db=db,
+        property_id=property_id,
+        limit=limit,
+        offset=offset,
     )
+    return PropertyListingsResponse(**listings.model_dump())
 
 
 def get_property_reviews(

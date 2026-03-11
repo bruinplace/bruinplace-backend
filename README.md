@@ -126,6 +126,27 @@ The API will be available at:
 - **Interactive API Docs**: http://localhost:8000/docs
 - **Alternative Docs**: http://localhost:8000/redoc
 
+## Ranked Listings Search Endpoint
+
+For typo-tolerant, Airbnb-style listing search, use:
+
+- `GET /api/v1/listings/search`
+
+This endpoint uses PostgreSQL full-text ranking plus trigram similarity and
+returns all matching results (unpaginated), sorted by relevance score.
+
+### Query parameters
+
+- Required: `q` (free-text query)
+- Optional filters: `status`, `unit_type`, `min_rent`, `max_rent`, `property_id`, `available_from_after`
+- Optional tuning: `min_score` (default `0.12`)
+
+### Example
+
+```bash
+curl "http://localhost:8000/api/v1/listings/search?q=de+neve+parking"
+```
+
 ## Map Viewport Listings Endpoint
 
 For map-based search (Airbnb-style), use:
@@ -140,7 +161,7 @@ padding), so clients can refetch on pan/zoom without loading the entire dataset.
 - Required bounds: `north`, `south`, `east`, `west`
 - Optional: `pad_ratio` (default `0.15`)
 - Optional listing filters: `status`, `unit_type`, `min_rent`, `max_rent`, `search`, `available_from_after`
-- Optional `limit` (default `120`, max `300`)
+- Optional `limit` (if omitted, returns all matches in bounds)
 
 ### Example
 

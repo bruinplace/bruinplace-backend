@@ -13,6 +13,8 @@ from app.api.v1.listings.schemas import (
     ListingMapQuery,
     ListingMapResponse,
     ListingResponse,
+    ListingSearchQuery,
+    ListingSearchResponse,
     ListingUpdate,
 )
 from app.api.v1.listings.services import (
@@ -21,6 +23,7 @@ from app.api.v1.listings.services import (
     get_listings,
     get_listings_in_bounds,
     list_amenities,
+    search_listings,
     soft_delete_listing,
     update_listing,
 )
@@ -65,6 +68,20 @@ def get_amenities_controller(db: Session = Depends(get_db)):
     Used by clients to show amenity options when creating or editing a listing.
     """
     return list_amenities(db=db)
+
+
+@router.get("/search", response_model=ListingSearchResponse)
+def search_listings_controller(
+    db: Session = Depends(get_db),
+    params: ListingSearchQuery = Depends(),
+):
+    """
+    Ranked fuzzy search across listing and property text.
+
+    Uses PostgreSQL full-text search + trigram similarity for typo-tolerant
+    matching and relevance ordering.
+    """
+    return search_listings(db=db, **params.model_dump())
 
 
 @router.post("", response_model=ListingResponse, status_code=status.HTTP_201_CREATED)

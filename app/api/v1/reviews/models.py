@@ -33,8 +33,12 @@ class Review(Base):
     rating = Column(
         Integer,
         nullable=False,
-        comment="Rating given by the user to the property between 1 and 5",
+        comment="Overall rating between 1 and 5 (derived from category ratings).",
     )
+    management_rating = Column(Integer, nullable=False)
+    cleanliness_rating = Column(Integer, nullable=False)
+    noise_level_rating = Column(Integer, nullable=False)
+    lease_flexibility_rating = Column(Integer, nullable=False)
     comment = Column(Text, nullable=True)
 
     # created_at, updated_at from Base
@@ -49,6 +53,22 @@ class Review(Base):
         CheckConstraint(
             "rating >= 1 AND rating <= 5",
             name="chk_review_rating_1_to_5",
-            comment="Rating must be between 1 and 5",
+            comment="Overall rating must be between 1 and 5",
+        ),
+        CheckConstraint(
+            "management_rating >= 1 AND management_rating <= 5",
+            name="chk_review_management_rating_1_to_5",
+        ),
+        CheckConstraint(
+            "cleanliness_rating >= 1 AND cleanliness_rating <= 5",
+            name="chk_review_cleanliness_rating_1_to_5",
+        ),
+        CheckConstraint(
+            "noise_level_rating >= 1 AND noise_level_rating <= 5",
+            name="chk_review_noise_level_rating_1_to_5",
+        ),
+        CheckConstraint(
+            "lease_flexibility_rating >= 1 AND lease_flexibility_rating <= 5",
+            name="chk_review_lease_flexibility_rating_1_to_5",
         ),
     )

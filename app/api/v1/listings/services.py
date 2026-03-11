@@ -3,7 +3,7 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi import HTTPException, status as http_status
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, case, func, or_
 from sqlalchemy.orm import Session
 
 from app.api.v1.listings.models import (
@@ -18,10 +18,12 @@ from app.api.v1.listings.schemas import (
     AmenityResponse,
     ListingCreate,
     ListingListResponse,
-    ListingResponse,
     ListingMapBounds,
     ListingMapItemResponse,
     ListingMapResponse,
+    ListingResponse,
+    ListingSearchItemResponse,
+    ListingSearchResponse,
     ListingUpdate,
 )
 from app.api.v1.properties.models import Property
@@ -59,6 +61,21 @@ def _amenities_for_listing_ids(
     for listing_id, amenity in pairs:
         by_listing[listing_id].append(AmenityResponse.model_validate(amenity))
     return by_listing
+
+
+def _parse_iso_date(value: Optional[str]) -> Optional[date]:
+    """Parse YYYY-MM-DD values safely; invalid values are ignored."""
+    if not value:
+        return None
+    try:
+        return date.fromisoformat(value)
+    except ValueError:
+        return None
+
+
+def _normalize_search_query(value: str) -> str:
+    """Collapse whitespace and trim user-entered query text."""
+    return " ".join(value.split()).strip()
 
 
 def _clamp(value: float, lower: float, upper: float) -> float:
@@ -157,6 +174,193 @@ def _listing_to_out(
     )
 
 
+def _search_item_to_out(
+    *,
+    listing: Listing,
+    property_row: Property,
+    amenities: list[AmenityResponse],
+    relevance_score: float,
+) -> ListingSearchItemResponse:
+    """Build one ranked listing search result."""
+    return ListingSearchItemResponse(
+        id=listing.id,
+        property_id=listing.property_id,
+        title=listing.title,
+        description=listing.description,
+        monthly_rent=listing.monthly_rent,
+        unit_type=listing.unit_type,
+        square_feet=listing.square_feet,
+        status=listing.status,
+        created_at=listing.created_at,
+        property_name=property_row.name,
+        address=property_row.address,
+        city=property_row.city,
+        state=property_row.state,
+        postal_code=property_row.postal_code,
+        country=property_row.country,
+        latitude=property_row.latitude,
+        longitude=property_row.longitude,
+        amenities=amenities,
+        relevance_score=round(relevance_score, 6),
+    )
+
+
+def search_listings(
+    db: Session,
+    *,
+    q: str,
+    status: Optional[ListingStatus] = None,
+    unit_type: Optional[UnitType] = None,
+    min_rent: Optional[int] = None,
+    max_rent: Optional[int] = None,
+    property_id: Optional[UUID] = None,
+    available_from_after: Optional[str] = None,
+    min_score: float = 0.12,
+) -> ListingSearchResponse:
+    """
+    Ranked fuzzy search over listing + property + amenity text.
+
+    Uses PostgreSQL full-text ranking (`ts_rank_cd`) and trigram similarity
+    (`pg_trgm`) to return typo-tolerant, relevance-sorted listing results.
+    """
+    normalized_query = _normalize_search_query(q)
+    if not normalized_query:
+        return ListingSearchResponse(items=[], total=0)
+
+    lower_query = normalized_query.lower()
+    contains_pattern = f"%{lower_query}%"
+    prefix_pattern = f"{lower_query}%"
+
+    amenities_text_subquery = (
+        db.query(
+            ListingAmenity.listing_id.label("listing_id"),
+            func.string_agg(Amenity.label, " ").label("amenities_text"),
+        )
+        .join(Amenity, ListingAmenity.amenity_id == Amenity.id)
+        .group_by(ListingAmenity.listing_id)
+        .subquery()
+    )
+
+    listing_text = func.concat_ws(
+        " ",
+        func.coalesce(Listing.title, ""),
+        func.coalesce(Listing.description, ""),
+    )
+    property_text = func.concat_ws(
+        " ",
+        func.coalesce(Property.name, ""),
+        func.coalesce(Property.address, ""),
+        func.coalesce(Property.city, ""),
+        func.coalesce(Property.state, ""),
+        func.coalesce(Property.postal_code, ""),
+        func.coalesce(Property.country, ""),
+    )
+    amenities_text = func.coalesce(amenities_text_subquery.c.amenities_text, "")
+    full_text = func.concat_ws(" ", listing_text, property_text, amenities_text)
+
+    listing_tsv = func.to_tsvector("english", listing_text)
+    property_tsv = func.to_tsvector("english", property_text)
+    amenities_tsv = func.to_tsvector("english", amenities_text)
+    ts_query = func.websearch_to_tsquery("english", normalized_query)
+
+    fts_match = or_(
+        listing_tsv.op("@@")(ts_query),
+        property_tsv.op("@@")(ts_query),
+        amenities_tsv.op("@@")(ts_query),
+    )
+    fts_rank = (
+        func.ts_rank_cd(listing_tsv, ts_query) * 1.8
+        + func.ts_rank_cd(property_tsv, ts_query) * 1.6
+        + func.ts_rank_cd(amenities_tsv, ts_query) * 1.0
+    )
+
+    trigram_score = func.greatest(
+        func.similarity(func.coalesce(Listing.title, ""), normalized_query),
+        func.similarity(func.coalesce(Listing.description, ""), normalized_query),
+        func.similarity(func.coalesce(Property.name, ""), normalized_query),
+        func.similarity(func.coalesce(Property.address, ""), normalized_query),
+        func.similarity(func.coalesce(Property.city, ""), normalized_query),
+        func.similarity(func.coalesce(Property.state, ""), normalized_query),
+        func.similarity(amenities_text, normalized_query),
+    )
+
+    exact_boost = case(
+        (func.lower(Listing.title) == lower_query, 1.1),
+        (func.lower(Property.name) == lower_query, 1.0),
+        else_=0.0,
+    )
+    prefix_boost = case(
+        (func.lower(Listing.title).like(prefix_pattern), 0.45),
+        (func.lower(Property.name).like(prefix_pattern), 0.35),
+        else_=0.0,
+    )
+
+    relevance_score = (
+        (fts_rank * 2.2)
+        + (trigram_score * 1.1)
+        + exact_boost
+        + prefix_boost
+    ).label("relevance_score")
+
+    query_len = len(lower_query)
+    if query_len <= 3:
+        fuzzy_floor = max(min_score, 0.30)
+    elif query_len <= 6:
+        fuzzy_floor = max(min_score, 0.20)
+    else:
+        fuzzy_floor = max(min_score, 0.12)
+
+    match_condition = or_(
+        fts_match,
+        trigram_score >= fuzzy_floor,
+        func.lower(full_text).like(contains_pattern),
+    )
+
+    search_query = (
+        db.query(Listing, Property, relevance_score)
+        .join(Property, Listing.property_id == Property.id)
+        .outerjoin(
+            amenities_text_subquery,
+            amenities_text_subquery.c.listing_id == Listing.id,
+        )
+        .where(
+            Listing.deleted_at.is_(None),
+            Property.deleted_at.is_(None),
+            match_condition,
+        )
+    )
+    if status is not None:
+        search_query = search_query.where(Listing.status == status)
+    if unit_type is not None:
+        search_query = search_query.where(Listing.unit_type == unit_type)
+    if min_rent is not None:
+        search_query = search_query.where(Listing.monthly_rent >= min_rent)
+    if max_rent is not None:
+        search_query = search_query.where(Listing.monthly_rent <= max_rent)
+    if property_id is not None:
+        search_query = search_query.where(Listing.property_id == property_id)
+
+    available_from_date = _parse_iso_date(available_from_after)
+    if available_from_date is not None:
+        search_query = search_query.where(Listing.available_from >= available_from_date)
+
+    total = search_query.order_by(None).count()
+    rows = search_query.order_by(relevance_score.desc(), Listing.created_at.desc()).all()
+
+    listing_ids = [listing.id for listing, _, _ in rows]
+    amenities_map = _amenities_for_listing_ids(db=db, listing_ids=listing_ids)
+    items = [
+        _search_item_to_out(
+            listing=listing,
+            property_row=property_row,
+            amenities=amenities_map.get(listing.id, []),
+            relevance_score=float(score or 0.0),
+        )
+        for listing, property_row, score in rows
+    ]
+    return ListingSearchResponse(items=items, total=total)
+
+
 def get_listings(
     db: Session,
     *,
@@ -199,12 +403,9 @@ def get_listings(
                 Listing.description.ilike(term),
             )
         )
-    if available_from_after:
-        try:
-            d = date.fromisoformat(available_from_after)
-            q = q.where(Listing.available_from >= d)
-        except ValueError:
-            pass  # Invalid date string: ignore filter
+    available_from_date = _parse_iso_date(available_from_after)
+    if available_from_date is not None:
+        q = q.where(Listing.available_from >= available_from_date)
 
     total = q.count()
     rows = q.order_by(Listing.created_at.desc()).offset(offset).limit(limit).all()
@@ -234,7 +435,7 @@ def get_listings_in_bounds(
     max_rent: Optional[int] = None,
     search: Optional[str] = None,
     available_from_after: Optional[str] = None,
-    limit: int = 120,
+    limit: Optional[int] = None,
 ) -> ListingMapResponse:
     """Return listings inside (optionally padded) map bounds."""
     if south > north:
@@ -284,15 +485,15 @@ def get_listings_in_bounds(
                 Property.address.ilike(term),
             )
         )
-    if available_from_after:
-        try:
-            d = date.fromisoformat(available_from_after)
-            q = q.where(Listing.available_from >= d)
-        except ValueError:
-            pass
+    available_from_date = _parse_iso_date(available_from_after)
+    if available_from_date is not None:
+        q = q.where(Listing.available_from >= available_from_date)
 
     total = q.count()
-    rows = q.order_by(Listing.created_at.desc()).limit(limit).all()
+    rows_query = q.order_by(Listing.created_at.desc())
+    if limit is not None:
+        rows_query = rows_query.limit(limit)
+    rows = rows_query.all()
     items = [
         _map_item_to_out(listing=listing, property_row=property_row)
         for listing, property_row in rows

@@ -124,7 +124,11 @@ class ListingMapQuery(BaseModel):
         None,
         description="Listings available on or after this date (YYYY-MM-DD)",
     )
-    limit: int = Field(120, ge=1, le=300)
+    limit: Optional[int] = Field(
+        None,
+        ge=1,
+        description="Optional max number of results to return. Defaults to no cap.",
+    )
 
 
 class ListingMapBounds(BaseModel):
@@ -163,3 +167,55 @@ class ListingMapResponse(BaseModel):
     total: int
     has_more: bool
     applied_bounds: ListingMapBounds
+
+
+class ListingSearchQuery(BaseModel):
+    """Query parameters for ranked full-text/fuzzy listing search."""
+
+    q: str = Field(..., min_length=1, description="Search query text")
+    status: Optional[ListingStatus] = Field(None, description="Filter by status")
+    unit_type: Optional[UnitType] = Field(None, description="Filter by unit type")
+    min_rent: Optional[int] = Field(None, ge=0, description="Minimum monthly rent")
+    max_rent: Optional[int] = Field(None, ge=0, description="Maximum monthly rent")
+    property_id: Optional[UUID] = Field(None, description="Filter by property")
+    available_from_after: Optional[str] = Field(
+        None,
+        description="Listings available on or after this date (YYYY-MM-DD)",
+    )
+    min_score: float = Field(
+        0.12,
+        ge=0,
+        le=1,
+        description="Minimum trigram similarity score for fuzzy-only matches",
+    )
+
+
+class ListingSearchItemResponse(BaseModel):
+    """Ranked listing search result with listing, property, and score metadata."""
+
+    id: UUID
+    property_id: UUID
+    title: str
+    description: str
+    monthly_rent: int
+    unit_type: UnitType
+    square_feet: Optional[int]
+    status: ListingStatus
+    created_at: datetime
+    property_name: str
+    address: str
+    city: str
+    state: str
+    postal_code: str
+    country: str
+    latitude: float
+    longitude: float
+    amenities: list[AmenityResponse] = Field(default_factory=list)
+    relevance_score: float
+
+
+class ListingSearchResponse(BaseModel):
+    """Unpaginated listing search response."""
+
+    items: list[ListingSearchItemResponse]
+    total: int

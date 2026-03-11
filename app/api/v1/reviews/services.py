@@ -25,6 +25,22 @@ def _get_property_or_404(db: Session, property_id: UUID) -> None:
         )
 
 
+def _overall_rating_from_categories(
+    *,
+    management_rating: int,
+    cleanliness_rating: int,
+    noise_level_rating: int,
+    lease_flexibility_rating: int,
+) -> int:
+    values = [
+        management_rating,
+        cleanliness_rating,
+        noise_level_rating,
+        lease_flexibility_rating,
+    ]
+    return int(round(sum(values) / len(values)))
+
+
 def create_review(
     db: Session, *, property_id: UUID, user_id: str, data: ReviewCreate
 ) -> ReviewResponse:
@@ -44,7 +60,16 @@ def create_review(
     row = Review(
         property_id=property_id,
         user_id=user_id,
-        rating=data.rating,
+        rating=_overall_rating_from_categories(
+            management_rating=data.management_rating,
+            cleanliness_rating=data.cleanliness_rating,
+            noise_level_rating=data.noise_level_rating,
+            lease_flexibility_rating=data.lease_flexibility_rating,
+        ),
+        management_rating=data.management_rating,
+        cleanliness_rating=data.cleanliness_rating,
+        noise_level_rating=data.noise_level_rating,
+        lease_flexibility_rating=data.lease_flexibility_rating,
         comment=data.comment,
     )
     db.add(row)
@@ -79,6 +104,23 @@ def update_review(
     update = data.model_dump(exclude_unset=True)
     for k, v in update.items():
         setattr(row, k, v)
+
+    if any(
+        key in update
+        for key in (
+            "management_rating",
+            "cleanliness_rating",
+            "noise_level_rating",
+            "lease_flexibility_rating",
+        )
+    ):
+        row.rating = _overall_rating_from_categories(
+            management_rating=row.management_rating,
+            cleanliness_rating=row.cleanliness_rating,
+            noise_level_rating=row.noise_level_rating,
+            lease_flexibility_rating=row.lease_flexibility_rating,
+        )
+
     db.commit()
     db.refresh(row)
     return ReviewResponse.model_validate(row)

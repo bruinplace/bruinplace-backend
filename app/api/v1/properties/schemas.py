@@ -60,6 +60,10 @@ class PropertyReviewStatsResponse(BaseModel):
 
     review_count: int
     average_rating: Optional[float] = None
+    average_management_rating: Optional[float] = None
+    average_cleanliness_rating: Optional[float] = None
+    average_noise_level_rating: Optional[float] = None
+    average_lease_flexibility_rating: Optional[float] = None
 
 
 class PropertyDetailResponse(PropertyResponse):
@@ -117,6 +121,10 @@ class PropertyReviewResponse(BaseModel):
     property_id: UUID
     user_id: str
     rating: int
+    management_rating: int
+    cleanliness_rating: int
+    noise_level_rating: int
+    lease_flexibility_rating: int
     comment: Optional[str] = None
     created_at: datetime
     updated_at: datetime
