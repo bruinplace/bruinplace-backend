@@ -100,3 +100,66 @@ class ListingListResponse(BaseModel):
 
     items: list[ListingResponse]
     total: int
+
+
+class ListingMapQuery(BaseModel):
+    """Query parameters for map viewport listing fetches."""
+
+    north: float = Field(..., ge=-90, le=90)
+    south: float = Field(..., ge=-90, le=90)
+    east: float = Field(..., ge=-180, le=180)
+    west: float = Field(..., ge=-180, le=180)
+    pad_ratio: float = Field(
+        0.15,
+        ge=0,
+        le=1,
+        description="Extra bounds percentage loaded beyond viewport",
+    )
+    status: Optional[ListingStatus] = Field(None, description="Filter by status")
+    unit_type: Optional[UnitType] = Field(None, description="Filter by unit type")
+    min_rent: Optional[int] = Field(None, ge=0, description="Minimum monthly rent")
+    max_rent: Optional[int] = Field(None, ge=0, description="Maximum monthly rent")
+    search: Optional[str] = Field(None, description="Search in listing/property text")
+    available_from_after: Optional[str] = Field(
+        None,
+        description="Listings available on or after this date (YYYY-MM-DD)",
+    )
+    limit: int = Field(120, ge=1, le=300)
+
+
+class ListingMapBounds(BaseModel):
+    """Bounds applied by the backend after optional padding."""
+
+    north: float
+    south: float
+    east: float
+    west: float
+
+
+class ListingMapItemResponse(BaseModel):
+    """Map-optimized listing payload with coordinates."""
+
+    id: UUID
+    property_id: UUID
+    title: str
+    monthly_rent: int
+    unit_type: UnitType
+    square_feet: Optional[int]
+    status: ListingStatus
+    created_at: datetime
+    property_name: str
+    address: str
+    city: str
+    state: str
+    postal_code: str
+    latitude: float
+    longitude: float
+
+
+class ListingMapResponse(BaseModel):
+    """Map viewport query response."""
+
+    items: list[ListingMapItemResponse]
+    total: int
+    has_more: bool
+    applied_bounds: ListingMapBounds

@@ -126,6 +126,42 @@ The API will be available at:
 - **Interactive API Docs**: http://localhost:8000/docs
 - **Alternative Docs**: http://localhost:8000/redoc
 
+## Map Viewport Listings Endpoint
+
+For map-based search (Airbnb-style), use:
+
+- `GET /api/v1/listings/map`
+
+This endpoint returns only listings within the provided map bounds (plus optional
+padding), so clients can refetch on pan/zoom without loading the entire dataset.
+
+### Query parameters
+
+- Required bounds: `north`, `south`, `east`, `west`
+- Optional: `pad_ratio` (default `0.15`)
+- Optional listing filters: `status`, `unit_type`, `min_rent`, `max_rent`, `search`, `available_from_after`
+- Optional `limit` (default `120`, max `300`)
+
+### Example
+
+```bash
+curl "http://localhost:8000/api/v1/listings/map?north=34.082&south=34.045&east=-118.421&west=-118.481&pad_ratio=0.2&status=active"
+```
+
+### Response shape
+
+- `items`: map-ready listing records with `latitude` and `longitude`
+- `total`: total matches within the applied (padded) bounds before limit
+- `has_more`: whether additional matches were truncated by `limit`
+- `applied_bounds`: final bounds used after padding
+
+Recommended frontend behavior:
+
+- Refetch on map `idle` (after drag/zoom settles), not on every camera tick
+- Keep a small debounce (about 150-250ms) to prevent request bursts
+- Use `pad_ratio` (0.1-0.25) to prefetch nearby listings and reduce flicker
+- Render up to a practical cap, then cluster or progressively load
+
 ### Custom Host/Port
 
 ```bash

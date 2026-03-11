@@ -10,6 +10,8 @@ from app.api.v1.listings.schemas import (
     ListingCreate,
     ListingFilterQuery,
     ListingListResponse,
+    ListingMapQuery,
+    ListingMapResponse,
     ListingResponse,
     ListingUpdate,
 )
@@ -17,6 +19,7 @@ from app.api.v1.listings.services import (
     create_listing,
     get_listing_by_id,
     get_listings,
+    get_listings_in_bounds,
     list_amenities,
     soft_delete_listing,
     update_listing,
@@ -38,6 +41,20 @@ def get_listings_controller(
     availability date.
     """
     return get_listings(db=db, **params.model_dump())
+
+
+@router.get("/map", response_model=ListingMapResponse)
+def get_listings_map_controller(
+    db: Session = Depends(get_db),
+    params: ListingMapQuery = Depends(),
+):
+    """
+    Return listings inside the given map viewport bounds.
+
+    Intended for map UIs that refresh results after pan/zoom. Supports optional
+    padding (`pad_ratio`) to prefetch nearby listings and reduce refetch churn.
+    """
+    return get_listings_in_bounds(db=db, **params.model_dump())
 
 
 @router.get("/amenities", response_model=list[AmenityResponse])
