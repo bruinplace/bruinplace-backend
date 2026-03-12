@@ -71,6 +71,14 @@ def build_s3_url(storage_key: str) -> str:
     return f"https://{S3_BUCKET}.s3.{settings.AWS_REGION}.amazonaws.com/{storage_key}"
 
 
+def build_low_res_storage_key(storage_key: str) -> str:
+    """Build deterministic low-res storage key from an original key."""
+    directory, _, filename = storage_key.rpartition("/")
+    stem = filename.rsplit(".", 1)[0] if "." in filename else filename
+    low_res_filename = f"{stem}_low.jpg"
+    return f"{directory}/{low_res_filename}" if directory else low_res_filename
+
+
 def generate_property_image_id_and_key(
     property_id: UUID,
     filename: str,
@@ -110,6 +118,20 @@ def upload_object(key: str, body: bytes, content_type: str) -> None:
         )
     except (ClientError, BotoCoreError) as exc:
         raise S3Error(f"Failed to upload object {key!r}") from exc
+
+
+def get_object_bytes(key: str) -> bytes:
+    """Download an S3 object and return its raw bytes."""
+    try:
+        response = s3_client.get_object(Bucket=S3_BUCKET, Key=key)
+        return response["Body"].read()
+    except ClientError as exc:
+        code = exc.response.get("Error", {}).get("Code", "")
+        if code in {"404", "NoSuchKey", "NotFound"}:
+            raise S3ObjectNotFoundError(f"Object not found in storage: {key!r}") from exc
+        raise S3Error(f"Failed to download object {key!r}") from exc
+    except BotoCoreError as exc:
+        raise S3Error(f"Failed to download object {key!r}") from exc
 
 
 def object_exists(key: str) -> bool:

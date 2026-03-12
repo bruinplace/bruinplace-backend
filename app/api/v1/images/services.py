@@ -5,18 +5,25 @@ from fastapi import HTTPException, status
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from app.api.v1.images.image_processing import (
+    InvalidImageError,
+    create_low_res_variant,
+)
 from app.api.v1.images.models import ListingImage, PropertyImage
 from app.api.v1.images.exceptions import S3Error, S3ObjectNotFoundError
 from app.api.v1.images.s3_utils import (
     assert_object_exists,
+    build_low_res_storage_key,
     build_s3_url,
     build_storage_key_for_listing,
     build_storage_key_for_property,
     delete_object,
     extension_from_filename_or_content_type,
     generate_presigned_put_url,
+    get_object_bytes,
     listing_images_prefix,
     property_images_prefix,
+    upload_object,
 )
 from app.api.v1.images.schemas import (
     BulkImageFinalizeRequest,
@@ -142,6 +149,45 @@ def _delete_s3_object(storage_key: str) -> None:
         ) from exc
 
 
+def _create_and_upload_low_res_image(storage_key: str) -> tuple[str, str]:
+    """Generate and upload low-res variant for a source image key."""
+    _validate_s3_settings()
+    try:
+        source_bytes = get_object_bytes(storage_key)
+        low_res_bytes = create_low_res_variant(source_bytes)
+    except S3ObjectNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Uploaded object was not found in storage",
+        ) from exc
+    except S3Error as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Storage provider error while reading upload",
+        ) from exc
+    except InvalidImageError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+
+    low_res_storage_key = build_low_res_storage_key(storage_key)
+
+    try:
+        upload_object(
+            key=low_res_storage_key,
+            body=low_res_bytes,
+            content_type="image/jpeg",
+        )
+    except S3Error as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Storage provider error while writing low-res image",
+        ) from exc
+
+    return low_res_storage_key, build_s3_url(low_res_storage_key)
+
+
 def _get_or_validate_existing_image(
     db: Session,
     image_model,
@@ -201,6 +247,8 @@ def _delete_image_row(
             detail=not_found_detail,
         )
     _delete_s3_object(image.storage_key)
+    if image.low_res_storage_key:
+        _delete_s3_object(image.low_res_storage_key)
     db.delete(image)
     db.commit()
 
@@ -314,6 +362,10 @@ def finalize_property_image(
     if existing:
         return ImageResponse.model_validate(existing)
 
+    low_res_storage_key, low_res_url = _create_and_upload_low_res_image(
+        payload.storage_key
+    )
+
     return _save_new_image(
         db=db,
         image_model=PropertyImage,
@@ -321,6 +373,8 @@ def finalize_property_image(
         property_id=property_id,
         storage_key=payload.storage_key,
         url=build_s3_url(payload.storage_key),
+        low_res_storage_key=low_res_storage_key,
+        low_res_url=low_res_url,
         display_order=payload.display_order
         if payload.display_order is not None
         else _next_display_order(
@@ -372,6 +426,10 @@ def finalize_listing_image(
     if existing:
         return ImageResponse.model_validate(existing)
 
+    low_res_storage_key, low_res_url = _create_and_upload_low_res_image(
+        payload.storage_key
+    )
+
     return _save_new_image(
         db=db,
         image_model=ListingImage,
@@ -380,6 +438,8 @@ def finalize_listing_image(
         property_id=listing.property_id,
         storage_key=payload.storage_key,
         url=build_s3_url(payload.storage_key),
+        low_res_storage_key=low_res_storage_key,
+        low_res_url=low_res_url,
         display_order=payload.display_order
         if payload.display_order is not None
         else _next_display_order(

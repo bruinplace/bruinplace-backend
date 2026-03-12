@@ -14,6 +14,8 @@ class ImageBase(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     storage_key = Column(Text, nullable=False)
     url = Column(Text, nullable=False)
+    low_res_storage_key = Column(Text, nullable=True)
+    low_res_url = Column(Text, nullable=True)
     display_order = Column(Integer, nullable=False)
 
     # created_at, updated_at from Base

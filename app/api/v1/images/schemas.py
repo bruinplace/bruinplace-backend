@@ -56,6 +56,7 @@ class ImageResponse(BaseModel):
     id: UUID
     storage_key: str
     url: str
+    low_res_url: Optional[str] = None
     display_order: int
     created_at: datetime
     updated_at: datetime

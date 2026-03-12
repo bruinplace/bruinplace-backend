@@ -126,6 +126,26 @@ The API will be available at:
 - **Interactive API Docs**: http://localhost:8000/docs
 - **Alternative Docs**: http://localhost:8000/redoc
 
+## Image Low-Res Backfill Script
+
+Image APIs now return an optional `low_res_url` field (in addition to `url`).
+New uploads automatically generate and store a low-res variant.
+
+To backfill low-res variants for existing rows:
+
+```bash
+uv run python scripts/run_script.py backfill_low_res_images
+```
+
+Optional flags:
+
+- `--scope property`
+- `--scope listing`
+- `--dry-run`
+- `--max-items 50` (process a small subset for a quick smoke test)
+- `--workers 8` (parallel S3/image work)
+- `--db-batch-size 100` (commit DB updates in batches)
+
 ## Ranked Listings Search Endpoint
 
 For typo-tolerant, Airbnb-style listing search, use:
